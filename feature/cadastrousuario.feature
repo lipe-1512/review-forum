@@ -28,3 +28,10 @@ Feature: Cadastro e Manutenção de Usuários
     Then vejo uma mensagem indicando que minha conta foi excluída
     And sou deslogado do sistema
     And não consigo mais acessar minha conta com as credenciais anteriores
+
+  Scenario: Usuário tenta cadastrar com senha fraca
+    Given que estou no processo de criação de uma nova conta
+    When informo uma senha que não atende aos critérios de segurança
+    Then vejo uma mensagem de erro indicando que a senha é fraca
+    And sou solicitado a escolher uma senha mais forte
+    And não consigo prosseguir com o cadastro até corrigir a senha
