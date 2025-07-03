@@ -1,10 +1,14 @@
 const express = require('express')
 const PORT = 8080
 const app = express()
-const movieRouter = require('./api/MovieApi')
 const bodyParser = require('body-parser')
 import {AppDataSource} from './infra/setup_db'
 import forumRouter from './api/ForumApi'
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
+import MovieRouter from './api/MovieApi'
+import endpointsRouter from './api/endpoints'
+
 
 app.listen(PORT, () => {
     console.log(`Server is running 🚀 on port ${PORT}`)
@@ -23,6 +27,18 @@ app.get('/', (req,res) => {
 })
 
 
+const swaggerOptions = {
+    swaggerDefinition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'My Express.js API',
+        version: '1.0.0',
+        description: 'A sample Express.js API built with TypeScript and Swagger',
+      },
+    },
+    apis: ['./src/api/*.ts'],
+  }
+  const swaggerDocs = swaggerJsdoc(swaggerOptions)
+  app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 
-app.use('/movies', movieRouter)
-app.use('/forums', forumRouter)
+app.use('/api', endpointsRouter)
