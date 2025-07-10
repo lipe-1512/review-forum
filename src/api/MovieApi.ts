@@ -5,7 +5,7 @@ const MovieRouter = Router()
 
 /**
  * @swagger
- * /movies:
+ * /api/movies:
  *   get:
  *     summary: Get all movies
  *     responses:
@@ -19,7 +19,7 @@ MovieRouter.get('/', async (request, response) => {
 
 /**
  * @swagger
- * /movies/get-by-id/{id}:
+ * /api/movies/get-by-id/{id}:
  *   get:
  *     summary: Get all movies
 *     parameters:
@@ -29,7 +29,7 @@ MovieRouter.get('/', async (request, response) => {
 *        required: true
  *     responses:
  *       200:
- *         description: List of movies
+ *         description: Desired movie
  *       404:
  *          description: No movie was founded with that ID
  */
@@ -39,15 +39,53 @@ MovieRouter.get('/get-by-id/:id', async (request: Request, response: Response) =
     response.send(JSON.stringify(result))
 })
 
+/**
+ * @swagger
+ * /api/movies/search/:
+ *   get:
+ *     summary: Get all movies
+*     parameters:
+*      - name: name
+*        in: query
+*        type: string
+*        description: Search movies from their title
+*        required: false
+ *     responses:
+ *       200:
+ *         description: List of movies with likely titles
+ *       404:
+ *          description: No movie was founded with that title
+ */
 MovieRouter.get('/search', async(request: Request, response: Response) => {
     let params = request.query
-    console.log(params)
     let result = await MovieServices.searchByName(params.name)
     response.send(result)
 })
 
+
+/**
+ * @swagger
+ * /api/movies/:
+ *   post:
+ *     summary: Create a movie
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Movie created
+ */
 MovieRouter.post('/', async (request, response) => {
     const movieDTO = request.body
+    console.log(movieDTO)
     const persistedMovie = await MovieServices.save(movieDTO)
     response.send(persistedMovie)
 })

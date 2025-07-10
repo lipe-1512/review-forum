@@ -1,4 +1,4 @@
-const { Entity, PrimaryGeneratedColumn, Column} = require('typeorm')
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn} from 'typeorm'
 
 @Entity()
 export class Movie {
@@ -10,7 +10,11 @@ export class Movie {
     name: string
 
     @Column()
-    description: string
+    description!: string
+
+    @CreateDateColumn()
+    created_at!: Date
+
 
   constructor(name: string, description: string) {
     this.name = name;

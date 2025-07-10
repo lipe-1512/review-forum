@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, UpdateDateColumn } from "typeorm"
 import { Movie } from "./Movie"
 
 @Entity()
@@ -7,7 +7,7 @@ export class Forum {
     @PrimaryGeneratedColumn()
     id!: Number
 
-    @Column()
+    @Column({nullable: false})
     generated_by_user: string
 
     @Column()
@@ -18,6 +18,10 @@ export class Forum {
 
     @CreateDateColumn()
     created_at!: Date
+
+
+    @UpdateDateColumn()
+    updated_at!: Date;
 
     @ManyToOne(() => Movie, (movie) => movie.id)
     related_movie: Movie

@@ -18,7 +18,6 @@ export default class MovieRepository {
     }
 
     static searchByName(name: string) : Promise<Movie[]> {
-        console.log('This is the name: ', name)
         return movieRepository.createQueryBuilder("movie").where(`movie.name LIKE '%${name}%'`).getMany()
     }
 

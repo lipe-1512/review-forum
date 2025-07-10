@@ -42,6 +42,10 @@ export default class ForumService implements IForumService {
             throw Error('TODO create a this error properly')
         }
 
+        if (!forum.title) {
+            throw new Error('O títutlo do forum é requerido')
+        }
+
         return ForumRepository.getInstance().saveForum(new Forum(forum.title, forum.description, forum.username, relatedMovie))
     }
 
