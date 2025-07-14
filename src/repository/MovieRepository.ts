@@ -21,7 +21,7 @@ export default class MovieRepository {
         return movieRepository.createQueryBuilder("movie").where(`movie.name LIKE '%${name}%'`).getMany()
     }
 
-    static saveMovie(movie: Movie) : Promise<any> {
+    static saveMovie(movie) : Promise<any> {
         return movieRepository.save(movie)
     }
 }

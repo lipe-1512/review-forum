@@ -7,7 +7,7 @@ export class Forum {
     @PrimaryGeneratedColumn()
     id!: Number
 
-    @Column({nullable: false})
+    @Column({nullable: false, update: false})
     generated_by_user: string
 
     @Column()
@@ -23,7 +23,7 @@ export class Forum {
     @UpdateDateColumn()
     updated_at!: Date;
 
-    @ManyToOne(() => Movie, (movie) => movie.id)
+    @ManyToOne(() => Movie, (movie) => movie.id, {nullable: false})
     related_movie: Movie
 
     constructor(title: string, description: string, username: string, relatedMovie: Movie) {

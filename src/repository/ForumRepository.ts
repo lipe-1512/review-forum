@@ -1,9 +1,7 @@
 import { AppDataSource } from "../infra/setup_db";
 import { Forum } from "../models/Forum";
-import { IForumService } from "../services/ForumService";
 
-
-export default class ForumRepository implements IForumService {
+export default class ForumRepository {
   private static instance: ForumRepository;
   private forumRepo = AppDataSource.getRepository(Forum);
 

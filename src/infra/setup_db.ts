@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { Movie } from "../models/Movie";
 import { Forum } from "../models/Forum";
+import Comment from "../models/Comment";
 
 
 export const AppDataSource = new DataSource({
@@ -12,7 +13,7 @@ export const AppDataSource = new DataSource({
   password: "asd",
   database: "review_forum",
   synchronize: true,       // auto-creates tables in dev :contentReference[oaicite:2]{index=2}
-  entities: [Movie, Forum],
+  entities: [Movie, Forum, Comment],
 });
 
 

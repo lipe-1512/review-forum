@@ -2,16 +2,8 @@ import { Forum } from "../models/Forum"
 import ForumRepository from "../repository/ForumRepository"
 import MovieServices from "./MovieServices"
 
-export interface IForumService {
-    getAll() : Promise<Forum[]>
-    getById(id: Number) : Promise<Forum | null>
-    searchByTitle(title: string) : Promise<Forum[]>
-    searchByCreatorUser(username: string): Promise<Forum[]>
-    saveForum(forum: any) : Promise<any>
-}
+export default class ForumService {
 
-
-export default class ForumService implements IForumService {
     private static instance: ForumService;
 
     private constructor() {}

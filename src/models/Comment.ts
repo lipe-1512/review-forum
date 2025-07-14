@@ -2,10 +2,10 @@ import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGenerated
 import { Forum } from "./Forum";
 
 @Entity()
-class Comment {
+export default class Comment {
 
     @PrimaryGeneratedColumn()
-    id: Number;
+    id!: Number;
 
     @Column({ nullable: false })
     content: string;
@@ -13,7 +13,7 @@ class Comment {
     @Column({ nullable: false })
     usernameAuthor: string;
 
-    @ManyToOne(() => Forum, (forum) => forum.id)
+    @ManyToOne(() => Forum, (forum) => forum.id, {nullable: false})
     forumId: number;
 
     @CreateDateColumn()
@@ -25,19 +25,14 @@ class Comment {
     @Column({type: 'boolean', default: false})
     isEdited!: boolean;
 
-    @Column({type: 'boolean', default: false, update: false})
-    isReply!: boolean;
-
     @OneToOne(() => Comment, (comment) => comment.id, {nullable: true})
     replyToCommentId?: number;
 
-    constructor(id: number, content: string, usernameAuthor: string, forumId: number, isEdited: boolean, replyToCommentId?: number) {
-        this.id = id;
+    constructor(content: string, usernameAuthor: string, forumId: number, isEdited: boolean, replyToCommentId?: number) {
         this.content = content;
         this.usernameAuthor = usernameAuthor;
         this.forumId = forumId;
         this.isEdited = isEdited;
-        this.isReply = !!replyToCommentId;
         this.replyToCommentId = replyToCommentId;
     }
 }

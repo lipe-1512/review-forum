@@ -86,7 +86,7 @@ MovieRouter.get('/search', async(request: Request, response: Response) => {
 MovieRouter.post('/', async (request, response) => {
     const movieDTO = request.body
     console.log(movieDTO)
-    const persistedMovie = await MovieServices.save(movieDTO)
+    const persistedMovie = await MovieServices.add(movieDTO)
     response.send(persistedMovie)
 })
 
