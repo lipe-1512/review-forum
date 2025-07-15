@@ -1,27 +1,4 @@
-import { AppDataSource } from "../infra/setup_db";
-import { Movie } from "../models/Movie";
-const movieRepository = AppDataSource.getRepository(Movie)
+import { AppDataSource } from '../infra/db';
+import { Movie } from '../models/Movie';
 
-
-export default class MovieRepository {
-
-    static getAll() : Promise<Movie[]> {
-        return movieRepository.find()
-    }
-
-    static getById(id: Number) : Promise<Movie | null> {
-        return movieRepository.findOne({
-            where: {
-                id: id
-            }
-        })
-    }
-
-    static searchByName(name: string) : Promise<Movie[]> {
-        return movieRepository.createQueryBuilder("movie").where(`movie.name LIKE '%${name}%'`).getMany()
-    }
-
-    static saveMovie(movie) : Promise<any> {
-        return movieRepository.save(movie)
-    }
-}
+export const movieRepository = AppDataSource.getRepository(Movie);
