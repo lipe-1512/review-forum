@@ -1,24 +1,24 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn} from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Review } from './Review';
+import { UserListItem } from './UserListItem';
 
 @Entity()
 export class Movie {
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @PrimaryGeneratedColumn()
-    id!: Number
+  @Column()
+  title!: string;
 
-    @Column()
-    name: string
+  @Column('text')
+  description!: string;
+  
+  @Column()
+  releaseYear!: number;
 
-    @Column()
-    description!: string
+  @OneToMany(() => Review, (review) => review.movie)
+  reviews!: Review[];
 
-    @CreateDateColumn()
-    created_at!: Date
-
-
-  constructor(name: string, description: string) {
-    this.name = name;
-    this.description = description;
-  }
-
+  @OneToMany(() => UserListItem, (listItem) => listItem.movie)
+  listItems!: UserListItem[];
 }
