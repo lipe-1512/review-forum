@@ -1,7 +1,7 @@
 import { Given } from '@cucumber/cucumber';
-import { World } from './world';
+import { ICustomWorld } from './world';
 
-Given('que estou autenticado no sistema', async function (this: World) {
+Given('que estou autenticado no sistema', async function (this: ICustomWorld) {
   // Simula um usuário que já existe e está logado
   this.currentUser = {
     id: 1,

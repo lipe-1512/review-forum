@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
-    "test": "@cucumber/cucumber"
+    "test": "npx cucumber-js"
   },
   "author": "",
   "license": "ISC",
