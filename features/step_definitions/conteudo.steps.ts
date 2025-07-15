@@ -1,119 +1,240 @@
 import { Given, When, Then } from '@cucumber/cucumber';
+import assert from 'assert';
+import { ICustomWorld } from './support/world';
 
-let films: any[] = [];
-let currentFilm: any = null;
-let currentUser: any = { username: 'joana_silva' };
-let reviews: any[] = [];
+// Simulação de banco de dados em memória para filmes, reviews e usuários
+interface Review {
+  text: string;
+  user: string;
+  rating?: number;
+}
 
-Given('o filme {string} com nota média {string} existe no sistema', function (film, rating) {
-  films.push({ title: film, rating: parseFloat(rating) });
+interface Movie {
+  title: string;
+  year?: string;
+  director?: string;
+  mainGenre?: string;
+  averageRating?: number;
+  reviews: Review[];
+  availability?: string;
+}
+
+const moviesDatabase: Map<string, Movie> = new Map();
+let currentReviewText: string = '';
+let currentReviewRating: number | undefined = undefined;
+let currentMovieTitleForReview: string = '';
+let lastMessage: string = '';
+
+Given('o filme {string} com nota média {string} existe no sistema', function (title: string, averageRating: string) {
+  const movie: Movie = {
+    title,
+    averageRating: parseFloat(averageRating),
+    reviews: [],
+  };
+  moviesDatabase.set(title, movie);
 });
 
-Given('o filme {string} possui as reviews: {string} por {string} e {string} por {string}', function (film, review1, user1, review2, user2) {
-  reviews.push({ film, reviews: [{ text: review1, user: user1 }, { text: review2, user: user2 }] });
+Given('o filme {string} possui as reviews: {string} por {string} e {string} por {string}', function (
+  title: string,
+  review1: string,
+  user1: string,
+  review2: string,
+  user2: string
+) {
+  const movie = moviesDatabase.get(title);
+  assert.ok(movie, `Filme "${title}" não encontrado no sistema.`);
+  movie.reviews.push({ text: review1, user: user1 });
+  movie.reviews.push({ text: review2, user: user2 });
 });
 
-When('eu acesso a página de detalhes do filme {string}', function (film) {
-  currentFilm = films.find(f => f.title === film);
-  if (!currentFilm) throw new Error('Filme não encontrado');
+When('eu acesso a página de detalhes do filme {string}', function (title: string) {
+  const movie = moviesDatabase.get(title);
+  assert.ok(movie, `Filme "${title}" não encontrado no sistema.`);
+  this.lastApiResponse = movie;
 });
 
-Then('eu devo ver {string} como título principal', function (title) {
-  if (currentFilm.title !== title) throw new Error('Título incorreto');
+Then('eu devo ver {string} como título principal', function (expectedTitle: string) {
+  assert.ok(this.lastApiResponse, 'Nenhuma resposta da API disponível.');
+  assert.strictEqual(this.lastApiResponse.title, expectedTitle, 'Título principal não corresponde.');
 });
 
-Then('eu devo ver a nota média {string} associada ao filme', function (rating) {
-  if (currentFilm.rating !== parseFloat(rating)) throw new Error('Nota média incorreta');
+Then('eu devo ver a nota média {string} associada ao filme', function (expectedRating: string) {
+  assert.ok(this.lastApiResponse, 'Nenhuma resposta da API disponível.');
+  const expected = parseFloat(expectedRating);
+  assert.strictEqual(this.lastApiResponse.averageRating, expected, 'Nota média não corresponde.');
 });
 
-Then('eu devo ver a review {string} de {string}', function (reviewText, user) {
-  const filmReviews = reviews.find(r => r.film === currentFilm.title);
-if (!filmReviews || !filmReviews.reviews.some((r: any) => r.text === reviewText && r.user === user)) {
-    throw new Error('Review não encontrada');
+Then('eu devo ver a review {string} de {string}', function (expectedReview: string, expectedUser: string) {
+  assert.ok(this.lastApiResponse, 'Nenhuma resposta da API disponível.');
+  const found = this.lastApiResponse.reviews.some(
+    (r: Review) => r.text === expectedReview && r.user === expectedUser
+  );
+  assert.ok(found, `Review "${expectedReview}" de "${expectedUser}" não encontrada.`);
+});
+
+Given('eu estou logado como o usuário {string}', function (username: string) {
+  this.currentUser = { id: 1, name: username, email: `${username}@example.com` };
+});
+
+Given('o filme {string} está disponível para avaliação no sistema', function (title: string) {
+  if (!moviesDatabase.has(title)) {
+    moviesDatabase.set(title, { title, reviews: [] });
   }
 });
 
-Given('eu estou logado como o usuário {string}', function (username) {
-  currentUser.username = username;
+Given('eu acesso a funcionalidade de adicionar review para o filme {string}', function (title: string) {
+  currentMovieTitleForReview = title;
 });
 
-Given('o filme {string} está disponível para avaliação no sistema', function (film) {
-  if (!films.find(f => f.title === film)) {
-    films.push({ title: film, rating: 0 });
+When('eu submeto uma review com o texto {string} e uma nota de {string}', function (reviewText: string, ratingText: string) {
+  currentReviewText = reviewText;
+  // Extrair número da nota, ex: "5 de 5 estrelas" -> 5
+  const match = ratingText.match(/(\d+)/);
+  currentReviewRating = match ? parseInt(match[1], 10) : undefined;
+  assert.ok(this.currentUser, 'Usuário deve estar logado para submeter review.');
+  assert.ok(moviesDatabase.has(currentMovieTitleForReview), `Filme "${currentMovieTitleForReview}" não encontrado.`);
+  const movie = moviesDatabase.get(currentMovieTitleForReview)!;
+  movie.reviews.push({ text: currentReviewText, user: this.currentUser.name, rating: currentReviewRating });
+  // Recalcular nota média
+  const ratings = movie.reviews.map(r => r.rating).filter(r => r !== undefined) as number[];
+  if (ratings.length > 0) {
+    movie.averageRating = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+  }
+  lastMessage = `Sua review para '${movie.title}' foi publicada com sucesso!`;
+});
+
+// Consolidar as definições de steps para evitar duplicidade e ambiguidade
+
+Then('eu devo visualizar a mensagem genérica {string}', function (expectedMessage: string) {
+  assert.strictEqual(lastMessage, expectedMessage, 'Mensagem exibida não corresponde.');
+});
+
+// Remover definições duplicadas para mensagens de sucesso e confirmação
+
+// A definição abaixo cobre mensagens de sucesso da review, atualização e confirmação
+Then(/eu devo visualizar a mensagem (de sucesso da review|de sucesso da atualização|de confirmação)( genérica)? {string}/, function (expectedMessage: string) {
+  assert.strictEqual(lastMessage, expectedMessage, 'Mensagem exibida não corresponde.');
+});
+
+// Removida definição duplicada para evitar conflito
+
+Then('minha avaliação, contendo o texto {string} e a nota {string}, deve estar visível na página do filme', function (expectedText: string, expectedRating: string) {
+  const movie = moviesDatabase.get(currentMovieTitleForReview);
+  assert.ok(movie, `Filme "${currentMovieTitleForReview}" não encontrado.`);
+  const found = movie.reviews.some(r => r.text === expectedText && r.rating === parseInt(expectedRating));
+  assert.ok(found, 'Avaliação não encontrada na página do filme.');
+});
+
+Given('o filme {string} existe no sistema com gênero {string} e ano {string}', function (title: string, genre: string, year: string) {
+  if (!moviesDatabase.has(title)) {
+    moviesDatabase.set(title, { title, mainGenre: genre, year: year, reviews: [] });
+  } else {
+    const movie = moviesDatabase.get(title)!;
+    movie.mainGenre = genre;
+    movie.year = year;
   }
 });
 
-Given('eu acesso a funcionalidade de adicionar review para o filme {string}', function (film) {
-  currentFilm = films.find(f => f.title === film);
-  if (!currentFilm) throw new Error('Filme não encontrado');
+Then('a nota média geral do filme {string} deve ser recalculada considerando minha nova nota', function (title: string) {
+  const movie = moviesDatabase.get(title);
+  assert.ok(movie, `Filme "${title}" não encontrado.`);
+  const ratings = movie.reviews.map(r => r.rating).filter(r => r !== undefined) as number[];
+  const average = ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
+  assert.strictEqual(movie.averageRating, average, 'Nota média geral não foi recalculada corretamente.');
 });
 
-When('eu submeto uma review com o texto {string} e uma nota de {string}', function (text, rating) {
-  reviews.push({ film: currentFilm.title, reviews: [{ text, user: currentUser.username, rating: parseFloat(rating) }] });
+Given('eu estou logado como um usuário {string} com permissões de administrador', function (username: string) {
+  this.currentUser = { id: 99, name: username, email: `${username}@example.com` };
+  this.currentUser.isAdmin = true;
 });
 
-Then('eu devo visualizar a mensagem {string}', function (message) {
-  // Simula mensagem de sucesso
-  return true;
-});
-
-Then('minha avaliação contendo o texto {string} e a nota {string} deve estar visível na página do filme', function (text, rating) {
-  const filmReviews = reviews.find(r => r.film === currentFilm.title);
-if (!filmReviews || !filmReviews.reviews.some((r: any) => r.text === text && r.rating === parseFloat(rating))) {
-    throw new Error('Avaliação não encontrada');
-  }
-});
-
-Then('a nota média geral do filme {string} deve ser recalculada considerando minha nova nota', function (film) {
-  // Simula recalculo da nota média
-  return true;
-});
-
-Given('eu estou logado como um usuário {string} com permissões de administrador', function (username) {
-  currentUser.username = username;
-  currentUser.isAdmin = true;
-});
-
-Given('estou na funcionalidade para adicionar um novo filme', function () {
-  return true;
+Given('eu estou na funcionalidade para adicionar um novo filme', function () {
+  // Pode ser um placeholder, pois não há UI real
 });
 
 When('eu tento cadastrar um filme com as seguintes informações:', function (dataTable) {
-  const data = dataTable.rowsHash();
-  films.push({ title: data['Título'], year: data['Ano'], director: data['Diretor'], genre: data['Gênero Principal'] });
+  assert.ok(this.currentUser && this.currentUser.isAdmin, 'Usuário deve ser administrador para cadastrar filme.');
+  // Corrigir uso de rowsHash para dataTable com mais de duas colunas
+  const rows = dataTable.raw();
+  const movie: Movie = {
+    title: rows[1][0],
+    year: rows[1][1],
+    director: rows[1][2],
+    mainGenre: rows[1][3],
+    reviews: [],
+  };
+  moviesDatabase.set(movie.title, movie);
+  lastMessage = `Filme '${movie.title}' cadastrado com sucesso.`;
 });
 
-Then('eu devo visualizar a mensagem de confirmação {string}', function (message) {
-  return true;
+Then('eu devo visualizar a mensagem de confirmação {string}', function (expectedMessage: string) {
+  assert.strictEqual(lastMessage, expectedMessage, 'Mensagem exibida não corresponde.');
 });
 
-Then('o filme {string} deve constar no sistema com os dados fornecidos: ano {string} diretor {string} e gênero {string}', function (title, year, director, genre) {
-  const film = films.find(f => f.title === title);
-  if (!film || film.year !== year || film.director !== director || film.genre !== genre) {
-    throw new Error('Dados do filme incorretos');
+// Remover step duplicada para evitar conflito
+
+Then('o filme {string} deve constar no sistema com os dados fornecidos: ano {string}, diretor {string} e gênero {string}', function (
+  title: string,
+  year: string,
+  director: string,
+  genre: string
+) {
+  const movie = moviesDatabase.get(title);
+  assert.ok(movie, `Filme "${title}" não encontrado.`);
+  assert.strictEqual(movie.year, year, 'Ano do filme não corresponde.');
+  assert.strictEqual(movie.director, director, 'Diretor do filme não corresponde.');
+  assert.strictEqual(movie.mainGenre, genre, 'Gênero do filme não corresponde.');
+});
+
+Given('o filme {string} está cadastrado no sistema', function (title: string) {
+  if (!moviesDatabase.has(title)) {
+    moviesDatabase.set(title, { title, reviews: [] });
   }
 });
 
-Given('o filme {string} está cadastrado no sistema', function (film) {
-  if (!films.find(f => f.title === film)) {
-    films.push({ title: film });
-  }
+Given('as informações de disponibilidade para {string} são: {string}', function (title: string, availability: string) {
+  const movie = moviesDatabase.get(title);
+  assert.ok(movie, `Filme "${title}" não encontrado.`);
+  movie.availability = availability;
 });
 
-Given('as informações de disponibilidade para {string} são: {string}', function (film, availability) {
-  const f = films.find(f => f.title === film);
-  if (f) {
-    f.availability = availability;
-  }
+When('eu consulto a seção {string} na página de detalhes do filme {string}', function (section: string, title: string) {
+  const movie = moviesDatabase.get(title);
+  assert.ok(movie, `Filme "${title}" não encontrado.`);
+  this.lastApiResponse = { section, availability: movie.availability };
 });
 
-When('eu consulto a seção {string} na página de detalhes do filme {string}', function (section, film) {
-  currentFilm = films.find(f => f.title === film);
-  if (!currentFilm) throw new Error('Filme não encontrado');
+Then('eu devo ser informado que o filme está disponível para streaming em {string}', function (expectedPlatform: string) {
+  assert.ok(this.lastApiResponse, 'Nenhuma resposta da API disponível.');
+  assert.ok(this.lastApiResponse.availability.includes(expectedPlatform), `Disponibilidade não inclui "${expectedPlatform}".`);
 });
 
-Then('eu devo ser informado que o filme está disponível para streaming em {string}', function (service) {
-  if (!currentFilm.availability.includes(service)) {
-    throw new Error('Serviço de streaming não encontrado');
+When('eu tento atualizar o {string} do filme {string} para {string}', function (field: string, title: string, newValue: string) {
+  assert.ok(this.currentUser && this.currentUser.isAdmin, 'Usuário deve ser administrador para editar filme.');
+  const movie = moviesDatabase.get(title);
+  assert.ok(movie, `Filme "${title}" não encontrado.`);
+  switch (field) {
+    case 'Gênero Principal':
+      movie.mainGenre = newValue;
+      break;
+    default:
+      throw new Error(`Campo "${field}" não suportado para edição.`);
   }
+  lastMessage = `Informações do filme '${title}' atualizadas com sucesso.`;
+});
+
+Then('eu devo visualizar a mensagem {string}', function (expectedMessage: string) {
+  assert.strictEqual(lastMessage, expectedMessage, 'Mensagem exibida não corresponde.');
+});
+
+Then('na página de detalhes do filme {string}, o gênero exibido deve ser {string}', function (title: string, expectedGenre: string) {
+  const movie = moviesDatabase.get(title);
+  assert.ok(movie, `Filme "${title}" não encontrado.`);
+  assert.strictEqual(movie.mainGenre, expectedGenre, 'Gênero exibido não corresponde.');
+});
+
+Then('o ano {string} do filme {string} deve continuar o mesmo', function (year: string, title: string) {
+  const movie = moviesDatabase.get(title);
+  assert.ok(movie, `Filme "${title}" não encontrado.`);
+  assert.strictEqual(movie.year, year, 'Ano do filme não corresponde.');
 });
