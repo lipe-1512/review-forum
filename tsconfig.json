@@ -1,19 +1,30 @@
 {
   "compilerOptions": {
+    // Configurações essenciais para o projeto
     "target": "es2017",
     "module": "commonjs",
     "outDir": "./dist",
     "rootDir": "./src",
-    "strict": true,
+    
+    // Configurações para interoperabilidade e módulos
+    "moduleResolution": "node",
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    
+    // Configurações para decorators do TypeORM
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "skipLibCheck": true,
+    
+    // Regras de Qualidade e Checagem de Tipos
+    "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true
+    
+    // Otimização de compilação
+    "skipLibCheck": true
   },
+  // Arquivos a serem incluídos na compilação
   "include": ["src/**/*"],
+  // Arquivos a serem excluídos
   "exclude": ["node_modules"]
 }

@@ -14,9 +14,12 @@ const forumRouter = Router()
  *         description: List all forums
  */
 forumRouter.get('/', async (request: Request, response: Response) => {
-    let result = await ForumService.getInstance().getAll()
-
-    response.send(result)
+    try {
+        const result = await ForumService.getInstance().getAll();
+        response.status(200).send(result);
+    } catch (e: any) {
+        response.status(500).send({ 'error': 'Internal server error' });
+    }
 })
 
 
@@ -42,16 +45,21 @@ forumRouter.get('/', async (request: Request, response: Response) => {
  *                  type: number
  *     responses:
  *       201:
- *         description: Movie created
+ *         description: Forum created
+ *       400:
+ *         description: Bad request (e.g., missing title)
  */
 forumRouter.post('/', async (request: Request, response: Response) => {
-    let forumDTO = request.body
-    let result = ForumService.getInstance().saveForum(forumDTO).then((result) => {
-        response.status(201).send(result)
-    }).catch((e) => {
-        response.status(400).send({'fail': e.message})
-    })
+    const forumDTO = request.body;
+    try {
+        const result = await ForumService.getInstance().saveForum(forumDTO);
+        // A versão correta é definir o status ANTES de enviar a resposta.
+        response.status(201).send(result);
+    } catch (e: any) {
+        // Envia uma resposta de erro clara com o status 400.
+        response.status(400).send({ 'fail': e.message });
+    }
 })
 
 
-export default forumRouter
+export default forumRouter;

@@ -1,3 +1,4 @@
+
 Feature: Forum management
 
   Scenario: Creating a forum
@@ -20,3 +21,4 @@ Feature: Forum management
     When trying to create a Forum with Title "O que vocês acharam do Sonic 3?", Description "I think went well, but should've done better this time" And Related Film "Sonic 3"
     Then the Forum must not be created
     And should throw an error message saying that the user is required
+
