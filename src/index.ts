@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import express from 'express';
 import bodyParser from 'body-parser';
-import { AppDataSource } from './infra/db';
-import mainRouter from './api/routes';
+import { AppDataSource } from './infra/db.js';
+import mainRouter from './api/routes/index.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +21,6 @@ AppDataSource.initialize()
       console.log(`Server is running on http://localhost:${PORT}`);
     });
   })
-  .catch((err) => {
+  .catch((err: any) => {
     console.error('Error during Data Source initialization:', err);
   });

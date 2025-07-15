@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Review } from './Review';
-import { UserListItem } from './UserListItem';
+import { Review } from './Review.js';
+import { UserListItem } from './UserListItem.js';
 
 @Entity()
 export class Movie {

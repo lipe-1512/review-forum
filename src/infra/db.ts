@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
-import { User } from '../models/User';
-import { Movie } from '../models/Movie';
-import { UserListItem } from '../models/UserListItem';
-import { Review } from '../models/Review';
+import { User } from '../models/User.js';
+import { Movie } from '../models/Movie.js';
+import { UserListItem } from '../models/UserListItem.js';
+import { Review } from '../models/Review.js';
 
 // ATENÇÃO: Altere as credenciais abaixo para as do seu banco de dados PostgreSQL
 export const AppDataSource = new DataSource({
