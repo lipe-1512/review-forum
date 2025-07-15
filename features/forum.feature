@@ -14,3 +14,9 @@ And Related film "Sonic 3"
 Then the forum should not be created
 And the user should see an error message "Title is required!"
 
+
+Scenario: Fail to create a forum
+Given There is no logged user
+When try to create a Forum with Title "O que vocês acharam do Sonic 3?", Description "I think went well, but should've done better this time" And Related Filme "Sonic 3"
+Then the Forum must not be created
+And should throw an error message saying that the user is required
