@@ -1,29 +1,30 @@
 {
-  "name": "review-forum",
+  "name": "review-forum-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend for the Review Forum application",
+  "main": "dist/index.js",
   "scripts": {
-    "test": "cucumber-js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/vncrodrigues13/review-forum.git"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/vncrodrigues13/review-forum/issues"
-  },
-  "homepage": "https://github.com/vncrodrigues13/review-forum#readme",
-  "devDependencies": {
-    "@cucumber/cucumber": "^11.3.0"
-  },
   "dependencies": {
-    "body-parser": "^2.2.0",
-    "express": "^5.1.0",
-    "pg": "^8.16.3",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "express": "^4.19.2",
+    "pg": "^8.11.5",
     "reflect-metadata": "^0.2.2",
-    "typeorm": "^0.3.25"
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.12.7",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
   }
 }
