@@ -1,12 +1,13 @@
 import { Given, When, Then } from '@cucumber/cucumber';
 import assert from 'assert';
+import { ICustomWorld } from './support/world'; // Importe o World
 
 let followingUsers: Set<string> = new Set();
-let currentUser: string = '';
+// A variável currentUser local não é mais necessária, vamos usar this.currentUser
 
 // Cenário: Usuário segue outro usuário
 
-Given('que estou navegando pelo perfil de outro usuário', function () {
+Given('que estou navegando pelo perfil de outro usuário', function (this: ICustomWorld) {
   // Simula navegação pelo perfil de outro usuário
   assert.ok(true, 'Navegando pelo perfil de outro usuário');
 });
