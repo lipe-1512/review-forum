@@ -12,7 +12,7 @@ const MovieRouter = Router()
  *       200:
  *         description: List of movies
  */
-MovieRouter.get('/', async (request, response) => {
+MovieRouter.get('/', async (request: Request, response: Response) => {
     const results = await MovieServices.getAll()
     response.send(results)
 })
@@ -83,7 +83,7 @@ MovieRouter.get('/search', async(request: Request, response: Response) => {
  *       200:
  *         description: Movie created
  */
-MovieRouter.post('/', async (request, response) => {
+MovieRouter.post('/', async (request: Request, response: Response) => {
     const movieDTO = request.body
     console.log(movieDTO)
     const persistedMovie = await MovieServices.add(movieDTO)

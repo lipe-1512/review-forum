@@ -47,9 +47,9 @@ forumRouter.get('/', async (request: Request, response: Response) => {
 forumRouter.post('/', async (request: Request, response: Response) => {
     let forumDTO = request.body
     let result = ForumService.getInstance().saveForum(forumDTO).then((result) => {
-        response.send(result).status(201)
+        response.status(201).send(result)
     }).catch((e) => {
-        response.send({'fail': e.message}).status(400)
+        response.status(400).send({'fail': e.message})
     })
 })
 

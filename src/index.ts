@@ -9,7 +9,6 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import MovieRouter from './api/MovieApi'
 import endpointsRouter from './api/endpoints'
-import type { RequestHandler } from 'express'
 
 
 app.listen(PORT, () => {
