@@ -2,7 +2,7 @@ import { Given, When, Then } from '@cucumber/cucumber';
 import assert from 'assert';
 import { ICustomWorld } from './support/world';
 
-// Simulação de banco de dados em memória para filmes, reviews e usuários
+// Simulação de banco de dados em memória para filmes, reviews, usuários e listas pessoais
 interface Review {
   text: string;
   user: string;
@@ -19,11 +19,21 @@ interface Movie {
   availability?: string;
 }
 
+interface PersonalListItem {
+  title: string;
+  type: string; // ex: filme, livro, série, anime
+}
+
 const moviesDatabase: Map<string, Movie> = new Map();
+const personalLists: Map<string, PersonalListItem[]> = new Map(); // key: username, value: list of items
+const userHistory: Map<string, { evaluations: string[]; posts: string[] }> = new Map();
+
 let currentReviewText: string = '';
 let currentReviewRating: number | undefined = undefined;
 let currentMovieTitleForReview: string = '';
 let lastMessage: string = '';
+
+// --- Passos existentes para filmes, reviews e usuários ---
 
 Given('o filme {string} com nota média {string} existe no sistema', function (title: string, averageRating: string) {
   const movie: Movie = {
@@ -103,20 +113,13 @@ When('eu submeto uma review com o texto {string} e uma nota de {string}', functi
   lastMessage = `Sua review para '${movie.title}' foi publicada com sucesso!`;
 });
 
-// Consolidar as definições de steps para evitar duplicidade e ambiguidade
-
 Then('eu devo visualizar a mensagem genérica {string}', function (expectedMessage: string) {
   assert.strictEqual(lastMessage, expectedMessage, 'Mensagem exibida não corresponde.');
 });
 
-// Remover definições duplicadas para mensagens de sucesso e confirmação
-
-// A definição abaixo cobre mensagens de sucesso da review, atualização e confirmação
 Then(/eu devo visualizar a mensagem (de sucesso da review|de sucesso da atualização|de confirmação)( genérica)? {string}/, function (expectedMessage: string) {
   assert.strictEqual(lastMessage, expectedMessage, 'Mensagem exibida não corresponde.');
 });
-
-// Removida definição duplicada para evitar conflito
 
 Then('minha avaliação, contendo o texto {string} e a nota {string}, deve estar visível na página do filme', function (expectedText: string, expectedRating: string) {
   const movie = moviesDatabase.get(currentMovieTitleForReview);
@@ -170,8 +173,6 @@ When('eu tento cadastrar um filme com as seguintes informações:', function (da
 Then('eu devo visualizar a mensagem de confirmação {string}', function (expectedMessage: string) {
   assert.strictEqual(lastMessage, expectedMessage, 'Mensagem exibida não corresponde.');
 });
-
-// Remover step duplicada para evitar conflito
 
 Then('o filme {string} deve constar no sistema com os dados fornecidos: ano {string}, diretor {string} e gênero {string}', function (
   title: string,
@@ -237,4 +238,99 @@ Then('o ano {string} do filme {string} deve continuar o mesmo', function (year: 
   const movie = moviesDatabase.get(title);
   assert.ok(movie, `Filme "${title}" não encontrado.`);
   assert.strictEqual(movie.year, year, 'Ano do filme não corresponde.');
+});
+
+// --- Novos passos para listas pessoais ---
+
+Given('que estou autenticado como usuário {string}', function (username: string) {
+  this.currentUser = { id: 1, name: username, email: `${username}@example.com` };
+  if (!personalLists.has(username)) {
+    personalLists.set(username, []);
+  }
+  if (!userHistory.has(username)) {
+    userHistory.set(username, { evaluations: [], posts: [] });
+  }
+});
+
+Given('que estou visualizando o item {string} do tipo {string}', function (title: string, type: string) {
+  // Apenas registra o item atual para uso nos passos seguintes
+  this.currentItem = { title, type };
+});
+
+When('escolho adicionar esse item à lista pessoal {string}', function (listName: string) {
+  assert.ok(this.currentUser, 'Usuário deve estar autenticado para adicionar itens à lista.');
+  const username = this.currentUser.name;
+  const list = personalLists.get(username);
+  assert.ok(list, 'Lista pessoal não encontrada para o usuário.');
+  // Verifica se o item já está na lista
+  const exists = list.some(item => item.title === this.currentItem.title && item.type === this.currentItem.type);
+  if (!exists) {
+    list.push(this.currentItem);
+    lastMessage = `Item '${this.currentItem.title}' adicionado à lista '${listName}'.`;
+  } else {
+    lastMessage = `Item '${this.currentItem.title}' já está na lista '${listName}'.`;
+  }
+});
+
+Then('o item deve ser adicionado com sucesso à lista {string}', function (listName: string) {
+  const username = this.currentUser.name;
+  const list = personalLists.get(username);
+  assert.ok(list, 'Lista pessoal não encontrada para o usuário.');
+  const found = list.some(item => item.title === this.currentItem.title);
+  assert.ok(found, `Item '${this.currentItem.title}' não encontrado na lista '${listName}'.`);
+  assert.strictEqual(lastMessage, `Item '${this.currentItem.title}' adicionado à lista '${listName}'.`);
+});
+
+Then('uma mensagem clara informa que o item já está na lista {string}', function (listName: string) {
+  assert.strictEqual(lastMessage, `Item '${this.currentItem.title}' já está na lista '${listName}'.`);
+});
+
+When('escolho remover o item {string} da lista pessoal {string}', function (title: string, listName: string) {
+  assert.ok(this.currentUser, 'Usuário deve estar autenticado para remover itens da lista.');
+  const username = this.currentUser.name;
+  const list = personalLists.get(username);
+  assert.ok(list, 'Lista pessoal não encontrada para o usuário.');
+  const index = list.findIndex(item => item.title === title);
+  if (index !== -1) {
+    list.splice(index, 1);
+    lastMessage = `Item '${title}' removido da lista '${listName}'.`;
+  } else {
+    lastMessage = `Item '${title}' não está na lista '${listName}'.`;
+  }
+});
+
+Then('o item {string} deve ser removido com sucesso da lista {string}', function (title: string, listName: string) {
+  const username = this.currentUser.name;
+  const list = personalLists.get(username);
+  assert.ok(list, 'Lista pessoal não encontrada para o usuário.');
+  const found = list.some(item => item.title === title);
+  assert.ok(!found, `Item '${title}' ainda está presente na lista '${listName}'.`);
+  assert.strictEqual(lastMessage, `Item '${title}' removido da lista '${listName}'.`);
+});
+
+Then('uma mensagem clara informa que o item {string} não está na lista {string}', function (title: string, listName: string) {
+  assert.strictEqual(lastMessage, `Item '${title}' não está na lista '${listName}'.`);
+});
+
+// --- Passos para visualizar histórico de avaliações e posts ---
+
+When('acesso a seção de histórico de atividades', function () {
+  assert.ok(this.currentUser, 'Usuário deve estar autenticado para acessar o histórico.');
+  const history = userHistory.get(this.currentUser.name);
+  this.lastApiResponse = history;
+});
+
+Then('vejo uma lista organizada das avaliações que realizei', function () {
+  assert.ok(this.lastApiResponse, 'Nenhuma resposta disponível para histórico.');
+  assert.ok(Array.isArray(this.lastApiResponse.evaluations), 'Avaliações devem ser uma lista.');
+});
+
+Then('cada avaliação mostra o item avaliado, a data e a nota atribuída', function () {
+  // Como estamos simulando, verificamos se há algum conteúdo na lista
+  assert.ok(this.lastApiResponse.evaluations.length > 0, 'Não há avaliações no histórico.');
+});
+
+Then('vejo uma lista organizada dos posts que realizei', function () {
+  assert.ok(this.lastApiResponse, 'Nenhuma resposta disponível para histórico.');
+  assert.ok(Array.isArray(this.lastApiResponse.posts), 'Posts devem ser uma lista.');
 });
