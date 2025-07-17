@@ -29,10 +29,19 @@ const swaggerOptions = {
         description: 'Documentação da API para o sistema de reviews e fóruns.',
       },
     },
-    apis: ['./src/api/**/*.ts'], // Escaneia todos os arquivos de rotas
+    apis: ['./src/api/routes/*.ts'], 
+    swagger: '2.0',
+    tags: [
+      {
+        name: 'default',
+        description: 'Default group for all endpoints',
+      },
+    ],
   };
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+// Ajuste temporário para contornar erro de tipos com swagger-ui-express
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', (swaggerUi.setup as any)(swaggerDocs));
 
 // ---- Rotas Principais da API ----
 app.use('/api', mainRouter);
