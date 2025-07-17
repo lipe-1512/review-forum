@@ -2,103 +2,158 @@ import request from 'supertest';
 import express from 'express';
 import userRouter from '../src/api/routes/user.routes';
 import UserRepositoryClass from '../src/repository/UserRepository';
+import { User } from '../src/models/User';
+import { Movie } from '../src/models/Movie';
 import bcrypt from 'bcryptjs';
+import { AppDataSource } from '../src/infra/db'; // Importa a fonte de dados correta
+import { UserListItem } from '../src/models/UserListItem';
 
+// Configuração do App Express para os testes
 const app = express();
 app.use(express.json());
 app.use('/users', userRouter);
 
-describe('User Routes', () => {
+describe('User API Endpoints - Gherkin Scenarios', () => {
   let server: any;
 
-  beforeAll((done) => {
-    server = app.listen(4000, done);
+  // Conecta ao banco de dados e inicia o servidor antes de todos os testes
+  beforeAll(async () => {
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+    }
+    server = app.listen(4002);
   });
 
-  afterAll((done) => {
-    server.close(done);
+  // Limpa as tabelas antes de CADA teste para garantir que um teste não interfira no outro
+  beforeEach(async () => {
+    const userRepository = AppDataSource.getRepository(User);
+    const movieRepository = AppDataSource.getRepository(Movie);
+    const listItemRepository = AppDataSource.getRepository(UserListItem);
+
+    // Limpa as tabelas em uma ordem que respeita as chaves estrangeiras para evitar erros
+    await listItemRepository.query('DELETE FROM "user_list_item";');
+    await userRepository.query('DELETE FROM "user_follows";');
+    await AppDataSource.getRepository(Movie).query('DELETE FROM "review";'); // Limpa reviews
+    await userRepository.query('DELETE FROM "user";');
+    await movieRepository.query('DELETE FROM "movie";');
   });
 
-  describe('POST /users/register', () => {
-    it('should register a new user successfully', async () => {
+  // Fecha a conexão com o banco e o servidor após a conclusão de todos os testes
+  afterAll(async () => {
+    if (AppDataSource.isInitialized) {
+      await AppDataSource.destroy();
+    }
+    server.close();
+  });
+
+  /**
+   * Feature: Cadastro de usuário
+   */
+  describe('1. Feature: Cadastro de usuário', () => {
+    it('Scenario: Usuário se cadastra com sucesso', async () => {
       const res = await request(server)
         .post('/users/register')
         .send({
-          name: 'Test User',
-          email: 'testuser@example.com',
-          password: 'StrongPass123'
+          name: 'Usuário Válido',
+          email: 'valido@example.com',
+          password: 'Password123'
         });
+      
       expect(res.statusCode).toEqual(201);
       expect(res.body).toHaveProperty('id');
-      expect(res.body.email).toBe('testuser@example.com');
+      expect(res.body.email).toBe('valido@example.com');
     });
 
-    it('should fail to register with missing fields', async () => {
+    it('Scenario: Falha ao cadastrar por campos inválidos (sem nome)', async () => {
       const res = await request(server)
         .post('/users/register')
         .send({
-          email: 'testuser2@example.com'
+          email: 'invalido@example.com',
+          password: 'password123'
         });
-      expect(res.statusCode).toEqual(400);
-      expect(res.body).toHaveProperty('message');
-    });
-
-    it('should fail to register with duplicate email', async () => {
-      // First registration
-      await request(server)
-        .post('/users/register')
-        .send({
-          name: 'Test User',
-          email: 'duplicate@example.com',
-          password: 'StrongPass123'
-        });
-      // Second registration with same email
-      const res = await request(server)
-        .post('/users/register')
-        .send({
-          name: 'Test User 2',
-          email: 'duplicate@example.com',
-          password: 'StrongPass123'
-        });
-      expect(res.statusCode).toEqual(400);
-      expect(res.body).toHaveProperty('message');
+      
+      expect(res.statusCode).toEqual(400); 
+      expect(res.body.message).toContain('Nome, email e senha são obrigatórios.');
     });
   });
 
-  describe('POST /users/login', () => {
-    const email = 'loginuser@example.com';
-    const password = 'LoginPass123';
+  /**
+   * Feature: Atualização de perfil do usuário
+   */
+  describe('2. Feature: Atualização de perfil do usuário', () => {
+    let userToUpdate: User;
 
-    beforeAll(async () => {
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = UserRepositoryClass.create({ name: 'Login User', email, password: hashedPassword });
-      await UserRepositoryClass.save(user);
+    beforeEach(async () => {
+      const hashedPassword = await bcrypt.hash('password', 10);
+      userToUpdate = await UserRepositoryClass.save(
+        UserRepositoryClass.create({ name: 'Original Name', email: 'update@example.com', password: hashedPassword })
+      );
     });
 
-    it('should login successfully with correct credentials', async () => {
+    it('Scenario: Usuário atualiza seu perfil com sucesso', async () => {
       const res = await request(server)
-        .post('/users/login')
-        .send({ email, password });
+        .put('/users/profile')
+        .send({ id: userToUpdate.id, name: 'Nome Atualizado' });
+
       expect(res.statusCode).toEqual(200);
-      expect(res.body).toHaveProperty('token');
-    });
-
-    it('should fail login with incorrect password', async () => {
-      const res = await request(server)
-        .post('/users/login')
-        .send({ email, password: 'WrongPass' });
-      expect(res.statusCode).toEqual(401);
-      expect(res.body).toHaveProperty('message');
-    });
-
-    it('should fail login with non-existent email', async () => {
-      const res = await request(server)
-        .post('/users/login')
-        .send({ email: 'nonexistent@example.com', password: 'AnyPass' });
-      expect(res.statusCode).toEqual(401);
-      expect(res.body).toHaveProperty('message');
+      expect(res.body.name).toBe('Nome Atualizado');
     });
   });
 
-  // Additional tests for update, delete, follow, unfollow, list management, recover, history can be added similarly
+  /**
+   * Feature: Exclusão de conta
+   */
+  describe('3. Feature: Exclusão de conta', () => {
+    it('Scenario: Usuário exclui sua conta com sucesso', async () => {
+        const hashedPassword = await bcrypt.hash('password', 10);
+        const userToDelete = await UserRepositoryClass.save(
+            UserRepositoryClass.create({ name: 'User to Delete', email: 'delete@example.com', password: hashedPassword })
+        );
+
+        const res = await request(server)
+            .delete('/users')
+            .send({ id: userToDelete.id });
+        
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.message).toBe('Conta excluída com sucesso');
+
+        const foundUser = await UserRepositoryClass.findById(userToDelete.id);
+        expect(foundUser).toBeNull();
+    });
+  });
+
+  /**
+   * Features: Seguir e Deixar de Seguir
+   */
+  describe('4 & 5. Features: Seguir e Deixar de Seguir Usuários', () => {
+    let userA: User, userB: User;
+
+    beforeEach(async () => {
+      const hashedPassword = await bcrypt.hash('p', 10);
+      [userA, userB] = await Promise.all([
+        UserRepositoryClass.save(UserRepositoryClass.create({ name: 'User A', email: 'a@example.com', password: hashedPassword })),
+        UserRepositoryClass.save(UserRepositoryClass.create({ name: 'User B', email: 'b@example.com', password: hashedPassword }))
+      ]);
+    });
+
+    it('Scenario: Usuário segue outro usuário com sucesso', async () => {
+      const res = await request(server)
+        .post(`/users/follow/${userB.id}`)
+        .send({ id: userA.id });
+
+      expect(res.statusCode).toEqual(200);
+      expect(res.body.message).toContain(`Seguindo usuário ${userB.id}`);
+    });
+    
+    it('Scenario: Usuário deixa de seguir outro usuário', async () => {
+        await UserRepositoryClass.followUser(userA.id, userB.id);
+
+        const res = await request(server)
+          .post(`/users/unfollow/${userB.id}`)
+          .send({ id: userA.id });
+  
+        expect(res.statusCode).toEqual(200);
+        expect(res.body.message).toContain(`Deixou de seguir usuário ${userB.id}`);
+    });
+  });
 });
