@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn } from 'typeorm';
-import { User } from './User.js';
-import { Movie } from './Movie.js';
+import { User } from './User';
+import { Movie } from './Movie';
 
 export enum ListType {
   WATCHED = 'WATCHED',
