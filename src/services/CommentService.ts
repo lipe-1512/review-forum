@@ -1,65 +1,115 @@
 import Comment from "../models/Comment";
-import CommentRepository from "../repository/CommentRepository";
 import ForumService from "./ForumService";
+import CommentRepository from "../repository/CommentRepository";
 
+// Definindo uma interface para o DTO (Data Transfer Object) de Comment.
+// Isso define a estrutura esperada dos dados que chegam da API.
+interface CommentDTO {
+    id?: number;
+    content: string;
+    usernameAuthor: string;
+    forumId: number; // O ID do fórum ao qual o comentário pertence.
+    replyToCommentId?: number;
+    isEdited?: boolean;
+}
 
 export default class CommentService {
 
-    static async getByForum(forumId) {
-        return CommentRepository.getByForum(forumId)
+    /**
+     * Busca todos os comentários de um fórum específico.
+     * @param forumId - O ID do fórum (pode ser string vindo da URL).
+     */
+    static async getByForum(forumId: number | string): Promise<Comment[]> {
+        const id = typeof forumId === 'string' ? parseInt(forumId, 10) : forumId;
+        return CommentRepository.getByForum(id);
     }
 
-    static async getCommentReplies(commentReferenceId) {
-        return CommentRepository.getByCommentReference(commentReferenceId)
+    /**
+     * Busca todas as respostas a um comentário específico.
+     * @param commentReferenceId - O ID do comentário de referência.
+     */
+    static async getCommentReplies(commentReferenceId: number | string): Promise<Comment[]> {
+        const id = typeof commentReferenceId === 'string' ? parseInt(commentReferenceId, 10) : commentReferenceId;
+        return CommentRepository.getByCommentReference(id);
     }
 
-    static async validate(comment) {
+    /**
+     * Valida os dados de um comentário antes de criar ou atualizar.
+     * @param comment - O objeto com os dados do comentário.
+     */
+    static async validate(comment: CommentDTO): Promise<void> {
         if (!comment.content) {
-            throw new Error('Conteúdo é obrigatório')
+            throw new Error('Conteúdo é obrigatório');
         }
 
         if (!comment.usernameAuthor) {
-            throw new Error('Nome de usuário do autor é obrigatório')
+            throw new Error('Nome de usuário do autor é obrigatório');
         }
 
-        if (!comment.forum) {
-            throw new Error('Fórum é obrigatório')
+        if (!comment.forumId) {
+            throw new Error('Fórum é obrigatório');
         }
         
-        let forum = await ForumService.getById(comment.forumId)
+        const forum = await ForumService.getById(comment.forumId);
 
         if (!forum) {
-            throw new Error('Fórum não encontrado')
+            throw new Error('Fórum não encontrado');
         }
 
         if (comment.replyToCommentId) {
             const referencedComment = await CommentRepository.getById(comment.replyToCommentId);
             if (!referencedComment) {
-                throw new Error('Comentário de referência não encontrado')
+                throw new Error('Comentário de referência não encontrado');
             }
         }
-
-        //TODO CREATE VALIDATE TESTS SCENARIOS
     }
 
-    static async add(comment) {
-        await this.validate(comment)
-        return CommentRepository.save(comment)
+    /**
+     * Adiciona um novo comentário ao banco de dados.
+     * @param commentDto - Os dados do comentário a ser criado.
+     */
+    static async add(commentDto: CommentDTO): Promise<Comment> {
+        await this.validate(commentDto);
+        
+        // Cria uma nova instância da entidade Comment para ser salva no banco
+        const newComment = new Comment(
+            commentDto.content,
+            commentDto.usernameAuthor,
+            commentDto.forumId,
+            false, // um novo comentário nunca é editado
+            commentDto.replyToCommentId
+        );
+        
+        return CommentRepository.save(newComment);
     }
 
-    static async getById(id) {
-        return CommentRepository.getById(id)
+    /**
+     * Busca um comentário pelo seu ID.
+     * @param id - O ID do comentário.
+     */
+    static async getById(id: number | string): Promise<Comment | null> {
+        const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+        return CommentRepository.getById(numericId);
     }
 
-    static async update(comment) {
-
-        const id = comment.id
-        if (!id) {
-            throw new Error('Comentário não encontrado com esse id')
+    /**
+     * Atualiza um comentário existente.
+     * @param commentData - Os dados a serem atualizados, incluindo o ID.
+     */
+    static async update(commentData: Partial<CommentDTO>): Promise<Comment> {
+        if (!commentData.id) {
+            throw new Error('ID do comentário é obrigatório para atualização.');
         }
 
-        let savedComment = this.getById(id)
-        savedComment = {...comment}
-        return CommentRepository.save(savedComment)
+        const savedComment = await this.getById(commentData.id);
+        if (!savedComment) {
+            throw new Error(`Comentário com ID ${commentData.id} não encontrado.`);
+        }
+
+        // Mescla os dados novos no registro existente e marca como editado
+        Object.assign(savedComment, commentData);
+        savedComment.isEdited = true;
+
+        return CommentRepository.save(savedComment);
     }
 }
