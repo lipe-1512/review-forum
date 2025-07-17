@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
-import { User } from '../models/User.js';
-import { Movie } from '../models/Movie.js';
-import { UserListItem } from '../models/UserListItem.js';
-import { Review } from '../models/Review.js';
+import { User } from '../models/User';
+import { Movie } from '../models/Movie';
+import { UserListItem } from '../models/UserListItem';
+import { Review } from '../models/Review';
 
 // ATENÇÃO: Altere as credenciais abaixo para as do seu banco de dados PostgreSQL
 export const AppDataSource = new DataSource({
@@ -10,7 +10,7 @@ export const AppDataSource = new DataSource({
   host: 'localhost',
   port: 5432,
   username: 'postgres', // Seu usuário
-  password: 'admin',      // Sua senha
+  password: '123',      // Sua senha
   database: 'review_forum_db', // Nome do seu banco de dados
   synchronize: true, // true em dev para criar tabelas automaticamente
   logging: false,    // false para não poluir o console com queries SQL
