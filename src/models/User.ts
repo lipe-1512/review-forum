@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable, OneToMany } from 'typeorm';
-import { Review } from './Review.js';
-import { UserListItem } from './UserListItem.js';
+import { Review } from './Review';
+import { UserListItem } from './UserListItem';
 
 @Entity()
 export class User {
