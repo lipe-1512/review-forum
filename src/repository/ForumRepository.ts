@@ -1,5 +1,5 @@
 import { UpdateResult } from "typeorm";
-import { AppDataSource } from "../infra/setup_db";
+import { AppDataSource } from "../infra/db";
 import { Forum } from "../models/Forum";
 
 export default class ForumRepository {

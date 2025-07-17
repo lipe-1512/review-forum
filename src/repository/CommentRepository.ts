@@ -1,4 +1,4 @@
-import { AppDataSource } from "../infra/setup_db";
+import { AppDataSource } from "../infra/db";
 import Comment from "../models/Comment";
 
 export default class CommentRepository {

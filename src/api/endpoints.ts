@@ -1,13 +1,14 @@
+import { Router } from "express";
 import commentRouter from "./CommentApi";
 import forumRouter from "./ForumApi";
-import MovieRouter from "./MovieApi";
-import { Router } from "express";
+import movieRouter from "./MovieApi";
+import userRoutes from "./routes/user.routes"; // Sua rota de usuário
 
-const endpointsRouter = Router()
+const endpointsRouter = Router();
 
-endpointsRouter.use('/movies', MovieRouter)
-endpointsRouter.use('/forums', forumRouter)
-endpointsRouter.use('/comments', commentRouter)
+endpointsRouter.use('/movies', movieRouter);
+endpointsRouter.use('/forums', forumRouter);
+endpointsRouter.use('/comments', commentRouter);
+endpointsRouter.use('/users', userRoutes); // Rota de usuário adicionada
 
-
-export default endpointsRouter
+export default endpointsRouter;

@@ -1,20 +1,19 @@
-import { DataSource } from 'typeorm';
+import "reflect-metadata";
+import { DataSource } from "typeorm";
 import { User } from '../models/User';
 import { Movie } from '../models/Movie';
-import { UserListItem } from '../models/UserListItem';
 import { Review } from '../models/Review';
+import { UserListItem } from '../models/UserListItem';
+import { Forum } from "../models/Forum";
+import Comment from "../models/Comment";
 
-// ATENÇÃO: Altere as credenciais abaixo para as do seu banco de dados PostgreSQL
 export const AppDataSource = new DataSource({
-  type: 'postgres',
-  host: 'localhost',
+  type: "postgres",
+  host: "127.0.0.1",
   port: 5432,
-  username: 'postgres', // Seu usuário
-  password: '123',      // Sua senha
-  database: 'review_forum_db', // Nome do seu banco de dados
-  synchronize: true, // true em dev para criar tabelas automaticamente
-  logging: false,    // false para não poluir o console com queries SQL
-  entities: [User, Movie, UserListItem, Review],
-  migrations: [],
-  subscribers: [],
+  username: "postgres",
+  password: "asd",
+  database: "review_forum",
+  synchronize: true,
+  entities: [User, Movie, Review, UserListItem, Forum, Comment], // Todas as entidades
 });
