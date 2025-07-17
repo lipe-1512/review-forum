@@ -4,41 +4,44 @@ import MovieServices from "./MovieServices"
 
 export default class ForumService {
 
-    private static instance: ForumService;
+    static getById(id: Number): Promise<Forum | null> {
+        return ForumRepository.getById(id)
+    }
 
-    private constructor() {}
+    static getAll(): Promise<Forum[]> {
+        return ForumRepository.getAll()
+    }
 
-    static getInstance(): ForumService {
-        if (!ForumService.instance) {
-        ForumService.instance = new ForumService();
+    static searchByTitle(title: string): Promise<Forum[]> {
+        return ForumRepository.searchByTitle(title)
+    }
+    static searchByCreatorUser(username: string): Promise<Forum[]> {
+        return ForumRepository.searchByCreatorUser(username)
+    }
+
+    static async updateForum(forum: Forum): Promise<any> {
+        const existingForum = await ForumRepository.getById(forum.id);
+        if (!existingForum) {
+            throw new Error('Forum not found');
         }
-        return ForumService.instance;
+
+        existingForum.title = forum.title;
+        existingForum.description = forum.description || '';
+        return ForumRepository.saveForum(existingForum);
     }
     
-    getById(id: Number): Promise<Forum | null> {
-        return ForumRepository.getInstance().getById(id)
-    }
-    getAll(): Promise<Forum[]> {
-        return ForumRepository.getInstance().getAll()
-    }
-    searchByTitle(title: string): Promise<Forum[]> {
-        return ForumRepository.getInstance().searchByTitle(title)
-    }
-    searchByCreatorUser(username: string): Promise<Forum[]> {
-        return ForumRepository.getInstance().searchByCreatorUser(username)
-    }
-    
-    async saveForum(forum: any): Promise<any> {
-        const relatedMovie= await MovieServices.getById(forum.relatedMovieId)
+    static async saveForum(forum: any): Promise<any> {
+        const relatedMovie= await MovieServices.getById(forum.movieId)
+        
         if (!relatedMovie) {
-            throw Error('TODO create a this error properly')
+            throw Error('Filme relacionado não encontrado')
         }
 
         if (!forum.title) {
             throw new Error('O títutlo do forum é requerido')
         }
 
-        return ForumRepository.getInstance().saveForum(new Forum(forum.title, forum.description, forum.username, relatedMovie))
+        return ForumRepository.saveForum(new Forum(forum.title, forum.description, forum.username, relatedMovie))
     }
 
 }

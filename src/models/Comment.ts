@@ -14,7 +14,7 @@ export default class Comment {
     usernameAuthor: string;
 
     @ManyToOne(() => Forum, (forum) => forum.id, {nullable: false})
-    forumId: number;
+    forum: number;
 
     @CreateDateColumn()
     created_at!: Date;
@@ -25,13 +25,13 @@ export default class Comment {
     @Column({type: 'boolean', default: false})
     isEdited!: boolean;
 
-    @OneToOne(() => Comment, (comment) => comment.id, {nullable: true})
+    @ManyToOne(() => Comment, (comment) => comment.id, {nullable: true})
     replyToCommentId?: number;
 
     constructor(content: string, usernameAuthor: string, forumId: number, isEdited: boolean, replyToCommentId?: number) {
         this.content = content;
         this.usernameAuthor = usernameAuthor;
-        this.forumId = forumId;
+        this.forum = forumId;
         this.isEdited = isEdited;
         this.replyToCommentId = replyToCommentId;
     }

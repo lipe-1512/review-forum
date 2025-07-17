@@ -7,19 +7,11 @@ export default class CommentRepository {
 
 
     static async getByForum(forumId) {
-        return this.commentRepo.find({
-            where: {
-                forumId: forumId
-            }
-        })
+        return this.commentRepo.createQueryBuilder("comment").where(`comment.forum = ${forumId}`).getMany()
     }
 
     static async getByCommentReference(commentReferenceId) {
-        return this.commentRepo.find({
-            where: {
-                replyToCommentId: commentReferenceId
-            }
-        })
+        return this.commentRepo.createQueryBuilder("comment").where(`comment.replyToCommentId = ${commentReferenceId}`).getMany()
     }
 
     static async save(comment) {

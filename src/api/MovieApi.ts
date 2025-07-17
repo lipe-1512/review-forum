@@ -5,14 +5,21 @@ const MovieRouter = Router();
 
 /**
  * @swagger
+ * tags:
+ *   name: Movies
+ *   description: Endpoints para gerenciamento de filmes
+ */
+
+/**
+ * @swagger
  * /api/movies:
  *   get:
  *     summary: Get all movies
+ *     tags: [Movies]
  *     responses:
  *       200:
  *         description: List of movies
  */
-// Mantendo a sua versão com tipagem explícita
 MovieRouter.get('/', async (request: Request, response: Response) => {
     try {
         const results = await MovieServices.getAll();
@@ -27,11 +34,14 @@ MovieRouter.get('/', async (request: Request, response: Response) => {
  * /api/movies/get-by-id/{id}:
  *   get:
  *     summary: Get movie by ID
+ *     tags: [Movies]
  *     parameters:
  *      - name: id
  *        in: path
  *        description: Movie ID
  *        required: true
+ *        schema:
+ *          type: integer
  *     responses:
  *       200:
  *         description: Desired movie
@@ -54,9 +64,10 @@ MovieRouter.get('/get-by-id/:id', async (request: Request, response: Response) =
 
 /**
  * @swagger
- * /api/movies/search/:
+ * /api/movies/search:
  *   get:
  *     summary: Search for movies by title
+ *     tags: [Movies]
  *     parameters:
  *      - name: name
  *        in: query
@@ -66,6 +77,8 @@ MovieRouter.get('/get-by-id/:id', async (request: Request, response: Response) =
  *     responses:
  *       200:
  *         description: List of movies with likely titles
+ *       400:
+ *         description: Query parameter 'name' is missing
  */
 MovieRouter.get('/search', async(request: Request, response: Response) => {
     try {
@@ -82,9 +95,10 @@ MovieRouter.get('/search', async(request: Request, response: Response) => {
 
 /**
  * @swagger
- * /api/movies/:
+ * /api/movies:
  *   post:
  *     summary: Create a movie
+ *     tags: [Movies]
  *     requestBody:
  *       required: true
  *       content:
@@ -102,7 +116,6 @@ MovieRouter.get('/search', async(request: Request, response: Response) => {
  *       400:
  *         description: Bad request (e.g., missing name)
  */
-// Mantendo a sua versão com tipagem explícita
 MovieRouter.post('/', async (request: Request, response: Response) => {
     try {
         const movieDTO = request.body;

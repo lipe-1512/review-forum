@@ -1,5 +1,6 @@
 import Comment from "../models/Comment";
 import CommentRepository from "../repository/CommentRepository";
+import ForumService from "./ForumService";
 
 
 export default class CommentService {
@@ -8,19 +9,41 @@ export default class CommentService {
         return CommentRepository.getByForum(forumId)
     }
 
-    static async getByCommentReference(commentReferenceId) {
+    static async getCommentReplies(commentReferenceId) {
         return CommentRepository.getByCommentReference(commentReferenceId)
     }
 
-    static validate(comment) {
+    static async validate(comment) {
         if (!comment.content) {
             throw new Error('Conteúdo é obrigatório')
         }
+
+        if (!comment.usernameAuthor) {
+            throw new Error('Nome de usuário do autor é obrigatório')
+        }
+
+        if (!comment.forum) {
+            throw new Error('Fórum é obrigatório')
+        }
+        
+        let forum = await ForumService.getById(comment.forumId)
+
+        if (!forum) {
+            throw new Error('Fórum não encontrado')
+        }
+
+        if (comment.replyToCommentId) {
+            const referencedComment = await CommentRepository.getById(comment.replyToCommentId);
+            if (!referencedComment) {
+                throw new Error('Comentário de referência não encontrado')
+            }
+        }
+
         //TODO CREATE VALIDATE TESTS SCENARIOS
     }
 
     static async add(comment) {
-        this.validate(comment)
+        await this.validate(comment)
         return CommentRepository.save(comment)
     }
 

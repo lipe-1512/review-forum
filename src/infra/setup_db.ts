@@ -15,11 +15,3 @@ export const AppDataSource = new DataSource({
   synchronize: true,       // auto-creates tables in dev :contentReference[oaicite:2]{index=2}
   entities: [Movie, Forum, Comment],
 });
-
-
-// export const AppDataSource = new DataSource({
-//   type: 'postgres',
-//   url: 'postgresql://neondb_owner:npg_rcu6dfB0HINb@ep-misty-shadow-a850nza6-pooler.eastus2.azure.neon.tech/review_forum?sslmode=require&channel_binding=require',
-//   synchronize: true,
-//   entities: [Movie, Forum]
-// })
