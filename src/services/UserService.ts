@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { userRepository } from '../repository/UserRepository';
+import UserRepositoryClass from '../repository/UserRepository';
 import { User } from '../models/User';
 
 export class UserService {
@@ -10,54 +10,57 @@ export class UserService {
       throw new Error('Nome, email e senha são obrigatórios.');
     }
 
-    const existingUser = await userRepository.findByEmail(email);
+    const existingUser = await UserRepositoryClass.findByEmail(email);
     if (existingUser) {
       throw new Error('E-mail já cadastrado no sistema.');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = userRepository.create({
+    const newUser = UserRepositoryClass.create({
       name,
       email,
       password: hashedPassword,
     });
-    return userRepository.save(newUser);
+    return UserRepositoryClass.save(newUser);
   }
 
   async update(id: number, updateData: Partial<User>): Promise<User | null> {
-    const user = await userRepository.findOneBy({ id });
+    const user = await UserRepositoryClass.findById(id);
     if (!user) {
       throw new Error('Usuário não encontrado.');
     }
-    userRepository.merge(user, updateData);
-    return userRepository.save(user);
+    UserRepositoryClass.merge(user, updateData);
+    return UserRepositoryClass.save(user);
   }
 
   async delete(id: number): Promise<void> {
-    const result = await userRepository.delete(id);
+    const result = await UserRepositoryClass.delete(id);
     if (result.affected === 0) {
       throw new Error('Usuário não encontrado.');
     }
   }
 
   async forgotPassword(email: string): Promise<void> {
-    const user = await userRepository.findByEmail(email);
+    const user = await UserRepositoryClass.findByEmail(email);
     if (!user) {
       // Silently succeed to prevent email enumeration
       return;
     }
     const resetToken = crypto.randomBytes(32).toString('hex');
-    user.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    Object.assign(user, {
+      passwordResetToken: crypto.createHash('sha256').update(resetToken).digest('hex'),
+      passwordResetExpires: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+    });
 
-    await userRepository.save(user);
+    await UserRepositoryClass.save(user);
     // Em um app real, aqui você enviaria um e-mail para o usuário com o `resetToken`
     console.log(`Password reset token for ${email}: ${resetToken}`);
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-    const user = await userRepository.findOneBy({
+    // @ts-ignore
+    const user = await UserRepositoryClass.findOneBy({
       passwordResetToken: hashedToken,
     });
 
@@ -66,9 +69,29 @@ export class UserService {
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
+    // @ts-ignore
     user.passwordResetToken = null;
+    // @ts-ignore
     user.passwordResetExpires = null;
 
-    await userRepository.save(user);
+    await UserRepositoryClass.save(user);
+  }
+
+  // Novos métodos para seguir, deixar de seguir e manipular listas pessoais
+
+  async followUser(userId: number, followId: number): Promise<void> {
+    await UserRepositoryClass.followUser(userId, followId);
+  }
+
+  async unfollowUser(userId: number, unfollowId: number): Promise<void> {
+    await UserRepositoryClass.unfollowUser(userId, unfollowId);
+  }
+
+  async addItemToList(userId: number, listName: string, itemId: number): Promise<void> {
+    await UserRepositoryClass.addItemToList(userId, listName, itemId);
+  }
+
+  async removeItemFromList(userId: number, listName: string, itemId: number): Promise<void> {
+    await UserRepositoryClass.removeItemFromList(userId, listName, itemId);
   }
 }
