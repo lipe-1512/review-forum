@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs';
 import { AppDataSource } from '../src/infra/db';
 import { UserListItem } from '../src/models/UserListItem';
 import { ListType } from '../src/models/UserListItem';
-import { MovieRepository } from '../src/repository/MovieRepository';
+import MovieRepository from '../src/repository/MovieRepository';
 
 const app = express();
 app.use(express.json());

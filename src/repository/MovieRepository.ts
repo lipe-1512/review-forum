@@ -1,4 +1,4 @@
-import { AppDataSource } from '../infra/db'; // ATENÇÃO: Corrigido para apontar para o arquivo de DB correto.
+import { AppDataSource } from '../infra/db';
 import { Movie } from '../models/Movie';
 import { ILike } from 'typeorm';
 
@@ -34,7 +34,7 @@ export default class MovieRepository {
     static searchByName(name: string): Promise<Movie[]> {
         return movieRepository.find({
             where: {
-                title: ILike(`%${name}%`) // Usando ILike para busca case-insensitive
+                name: ILike(`%${name}%`) // Usando ILike para busca case-insensitive
             }
         });
     }
