@@ -12,8 +12,8 @@ export const AppDataSource = new DataSource({
   host: "127.0.0.1",
   port: 5432,
   username: "postgres",
-  password: "asd",
-  database: "review_forum",
+  password: "123",
+  database: "review_forum_db",
   synchronize: true,
   entities: [User, Movie, Review, UserListItem, Forum, Comment], // Todas as entidades
 });
