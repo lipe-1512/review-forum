@@ -9,22 +9,20 @@ const movieRepository: Repository<Movie> = AppDataSource.getRepository(Movie);
 const userListItemRepository: Repository<UserListItem> = AppDataSource.getRepository(UserListItem);
 
 export default class UserRepositoryClass {
-  static async findByEmail(email: string): Promise<User | null> {
+  static findByEmail(email: string): Promise<User | null> {
     return userRepository.findOneBy({ email });
   }
 
-  static async findById(id: number): Promise<User | null> {
+  static findById(id: number): Promise<User | null> {
     return userRepository.findOneBy({ id });
   }
 
-  static async save(user: User): Promise<User> {
+  static save(user: User): Promise<User> {
     return userRepository.save(user);
   }
 
   static async delete(id: number): Promise<{ affected?: number }> {
     const result = await userRepository.delete(id);
-    // TypeORM DeleteResult.affected can be number | null | undefined
-    // Normalize null to undefined to satisfy return type
     return { affected: result.affected ?? undefined };
   }
 
@@ -34,25 +32,6 @@ export default class UserRepositoryClass {
 
   static merge(user: User, updateData: Partial<User>): User {
     return userRepository.merge(user, updateData);
-  }
-
-  // To fix type incompatibility, omit problematic properties from conditions
-  static async findOneBy(conditions: Partial<Omit<User, 'following' | 'passwordResetToken' | 'passwordResetExpires'>> & { passwordResetToken?: string | null }): Promise<User | null> {
-    // Use query builder to avoid type issues with nullable fields
-    const query = userRepository.createQueryBuilder('user');
-
-    if (conditions.passwordResetToken) {
-      query.andWhere('user.passwordResetToken = :token', { token: conditions.passwordResetToken });
-    }
-    if (conditions.id) {
-      query.andWhere('user.id = :id', { id: conditions.id });
-    }
-    if (conditions.email) {
-      query.andWhere('user.email = :email', { email: conditions.email });
-    }
-
-    const user = await query.getOne();
-    return user ?? null;
   }
 
   static async followUser(userId: number, followId: number): Promise<void> {
@@ -73,26 +52,42 @@ export default class UserRepositoryClass {
     }
   }
 
+  // --- MÉTODO CORRIGIDO ---
   static async unfollowUser(userId: number, unfollowId: number): Promise<void> {
     const user = await userRepository.findOne({
       where: { id: userId },
       relations: ['following'],
     });
-    if (!user || !user.following) {
-      throw new Error('Usuário não encontrado ou não está seguindo ninguém.');
+
+    if (!user) {
+      throw new Error('Usuário não encontrado.');
     }
+    
+    // Guarda a contagem inicial de usuários seguidos
+    const initialFollowingCount = user.following ? user.following.length : 0;
+
+    // Tenta remover o usuário da lista
     user.following = user.following.filter(u => u.id !== unfollowId);
+
+    // Guarda a contagem final
+    const finalFollowingCount = user.following.length;
+
+    // Se as contagens são iguais, nada foi removido. Lança um erro.
+    if (initialFollowingCount === finalFollowingCount) {
+      throw new Error('Não é possível deixar de seguir um usuário que não está sendo seguido.');
+    }
+
+    // Se a contagem mudou, salva o usuário com a lista atualizada.
     await userRepository.save(user);
   }
+  // --- FIM DA CORREÇÃO ---
+
 
   static async addItemToList(userId: number, listName: string, itemId: number): Promise<void> {
     const user = await userRepository.findOneBy({ id: userId });
     const movie = await movieRepository.findOneBy({ id: itemId });
-    if (!user) {
-      throw new Error('Usuário não encontrado.');
-    }
-    if (!movie) {
-      throw new Error('Filme não encontrado.');
+    if (!user || !movie) {
+      throw new Error('Usuário ou Filme não encontrado.');
     }
 
     const listType = ListType[listName.toUpperCase() as keyof typeof ListType];
@@ -101,15 +96,11 @@ export default class UserRepositoryClass {
     }
 
     const existingItem = await userListItemRepository.findOne({
-      where: { user: { id: userId }, movie: { id: itemId }, listType },
+      where: { user: { id: user.id }, movie: { id: Number(movie.id) }, listType },
     });
 
     if (!existingItem) {
-      const newItem = userListItemRepository.create({
-        user,
-        movie,
-        listType,
-      });
+      const newItem = userListItemRepository.create({ user, movie, listType });
       await userListItemRepository.save(newItem);
     }
   }
@@ -127,7 +118,6 @@ export default class UserRepositoryClass {
     if (!existingItem) {
       throw new Error('Item não encontrado na lista.');
     }
-
     await userListItemRepository.remove(existingItem);
   }
 }

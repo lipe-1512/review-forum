@@ -1,12 +1,11 @@
 {
-  "name": "review-forum",
+  "name": "review-forum-backend",
   "version": "1.0.0",
   "description": "Backend for the Review Forum application",
   "main": "dist/index.js",
   "scripts": {
     "test": "jest --runInBand",
-    "test:api": "jest --testPathPattern=tests/.*.test.ts",
-    "test:bdd": "jest --testPathPattern=features/.*.steps.ts",
+    "test:coverage": "jest --coverage --runInBand",
     "dev": "nodemon --exec ts-node ./src/index.ts",
     "swagger": "node ./src/swagger.ts"
   },
