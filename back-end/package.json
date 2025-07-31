@@ -1,0 +1,50 @@
+{
+  "name": "review-forum",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vncrodrigues13/review-forum.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vncrodrigues13/review-forum/issues"
+  },
+  "homepage": "https://github.com/vncrodrigues13/review-forum#readme",
+  "devDependencies": {
+<<<<<<< Updated upstream:package.json
+    "@cucumber/cucumber": "^11.3.0"
+=======
+    "@cucumber/cucumber": "^11.3.0",
+    "@types/express": "^5.0.3",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.0.10",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "jest": "^30.0.4",
+    "jest-cucumber": "^4.5.0",
+    "nodemon": "^3.1.10",
+    "swagger-autogen": "^2.23.7",
+    "ts-jest": "^29.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mysql": "^2.18.1",
+    "pg": "^8.16.3",
+    "reflect-metadata": "^0.2.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-dist": "^5.26.0",
+    "swagger-ui-express": "^5.0.1",
+    "typeorm": "^0.3.25"
+>>>>>>> Stashed changes:back-end/package.json
+  }
+}

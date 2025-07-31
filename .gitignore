@@ -1,2 +1,10 @@
+<<<<<<< Updated upstream
 package-lock.json
 node_modules/
+=======
+back-end/package-lock.json
+*/node_modules/
+back-end/yarn.lock
+back-end/personal-notes.md
+back-end/coverage/
+>>>>>>> Stashed changes
