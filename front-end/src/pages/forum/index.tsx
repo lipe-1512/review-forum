@@ -2,18 +2,12 @@ import './Forum.css'
 import { listAll } from '@/services/ForumService';
 
 
-const forumData = [
-  { title: 'Sample Title', author: 'John Doe', movie: 'Inception' },
-  { title: 'Sample Title', author: 'John Doe', movie: 'Inception' },
-  { title: 'Sample Title', author: 'John Doe', movie: 'Inception' },
-  { title: 'Sample Title', author: 'John Doe', movie: 'Inception' },
-  { title: 'Sample Title', author: 'John Doe', movie: 'Inception' },
-  { title: 'Sample Title', author: 'John Doe', movie: 'Inception' },
-];
+let forumData: any[] = []
 
+let list = await listAll()
 
-let list = listAll()
-console.log(list)
+forumData = list
+
 
 export default function Forum() {
   return (
@@ -29,9 +23,9 @@ export default function Forum() {
         <tbody>
             {forumData.map((item, index) => (
                 <tr key={index}>
-                    <td>{item.title}</td>
-                    <td>{item.author}</td>
-                    <td>{item.movie}</td>
+                    <td className='forum-name'>{item.title}</td>
+                    <td className='forum-username'>{item.username}</td>
+                    <td className='forum-related_movie-name'>{item.related_movie.name}</td>
                 </tr>
             ))}
         </tbody>

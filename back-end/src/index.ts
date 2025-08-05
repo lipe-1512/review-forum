@@ -8,6 +8,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import MovieRouter from './api/MovieApi'
 import endpointsRouter from './api/endpoints'
+import cors from 'cors'
 
 
 app.listen(PORT, () => {
@@ -21,6 +22,7 @@ app.listen(PORT, () => {
 })
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
+app.use(cors())
 
 app.get('/', (req,res) => {
     res.send('Landing page is up!')

@@ -8,3 +8,8 @@ export const listAll = async () => {
 }
 
 
+export const getById = async (id : any) => {
+    const response = await axios.get(FORUM_BASE_URL + id);
+    return response.data;
+}
+

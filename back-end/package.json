@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-     "test": "jest",
+    "test": "jest",
     "dev": "nodemon --exec ts-node ./src/index.ts",
     "swagger": "node ./src/swagger.ts"
   },
@@ -20,6 +20,7 @@
   "homepage": "https://github.com/vncrodrigues13/review-forum#readme",
   "devDependencies": {
     "@cucumber/cucumber": "^11.3.0",
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.10",
