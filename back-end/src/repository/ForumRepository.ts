@@ -9,7 +9,10 @@ export default class ForumRepository {
   static getAll(): Promise<Forum[]> {
     return this.forumRepo.find(
       {
-        relations: ["related_movie"]
+        relations: ["related_movie"],
+        order: {
+          updated_at: 'DESC'
+        }
       }
     );
   }

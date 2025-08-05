@@ -1,124 +1,64 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Comment from './Comment';
 import './Comments.css';
-
-interface Comment {
-  id: number;
-  user: {
-    name: string;
-    avatar: string;
-  };
-  content: string;
-  timestamp: string;
-  likes: number;
-  replies?: Comment[];
-}
-
-interface CommentProps {
-  comment: Comment;
-  onReply: (commentId: number) => void;
-  level?: number;
-}
-
-const CommentItem: React.FC<CommentProps> = ({ comment, onReply, level = 0 }) => {
-  const [liked, setLiked] = useState(false);
-  const [likeCount, setLikeCount] = useState(comment.likes);
-
-  const handleLike = () => {
-    setLiked(!liked);
-    setLikeCount(liked ? likeCount - 1 : likeCount + 1);
-  };
-
-  return (
-    <div className="comment-item" style={{ marginLeft: `${level * 20}px` }}>
-      <div className="comment-content">
-        <div className="comment-header">
-          <img src={comment.user.avatar} alt={comment.user.name} className="user-avatar" />
-          <div className="comment-info">
-            <span className="user-name">{comment.user.name}</span>
-            <span className="timestamp">{comment.timestamp}</span>
-          </div>
-        </div>
-        
-        <div className="comment-text">
-          {comment.content}
-        </div>
-        
-        <div className="comment-actions">
-          <button 
-            className={`like-button ${liked ? 'liked' : ''}`}
-            onClick={handleLike}
-          >
-            👍 {likeCount}
-          </button>
-          <button 
-            className="reply-button"
-            onClick={() => onReply(comment.id)}
-          >
-            Reply
-          </button>
-        </div>
-      </div>
-      
-      {comment.replies && comment.replies.map((reply) => (
-        <CommentItem
-          key={reply.id}
-          comment={reply}
-          onReply={onReply}
-          level={level + 1}
-        />
-      ))}
-    </div>
-  );
-};
+import { listAll } from '@/services/CommentService';
 
 interface CommentsProps {
-  comments: Comment[];
+  forumId?: number;
+  comments?: any[];
 }
 
-export const Comments: React.FC<CommentsProps> = ({ comments }) => {
-  const [newComment, setNewComment] = useState('');
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
+const Comments: React.FC<CommentsProps> = ({ forumId, comments }) => {
+  const [commentsData, setCommentsData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newComment.trim()) {
-      // Aqui você adicionaria a lógica para salvar o comentário
-      console.log('Novo comentário:', newComment);
-      setNewComment('');
+  const formatDate = (dateString: string): string => {
+    try {
+      const date = new Date(dateString);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch (error) {
+      console.error('Erro ao formatar data:', error);
+      return dateString;
     }
   };
 
-  const handleReply = (commentId: number) => {
-    setReplyingTo(commentId);
-    // Aqui você poderia focar no input ou abrir um modal de resposta
-  };
+  useEffect(() => {
+    if (comments) {
+      setCommentsData(comments);
+      setLoading(false);
+    } else {
+      setLoading(true);
+    }
+  }, [comments]);
+
+
+  if (loading) {
+    return (
+      <div className="comments-container">
+        <h3>Comentários</h3>
+        <div className="loading">Carregando comentários...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="comments-container">
-      <h2 className="comments-title">Comments</h2>
-      
-      <form className="comment-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Digite seu comentário..."
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          className="comment-input"
-        />
-        <button type="submit" className="submit-button">
-          Enviar
-        </button>
-      </form>
-
+      <h3>Comentários</h3>
       <div className="comments-list">
-        {comments.map((comment) => (
-          <CommentItem
-            key={comment.id}
-            comment={comment}
-            onReply={handleReply}
+        {commentsData.map((comment: any) => (
+          <Comment
+            id={comment.id}
+            author={comment.username}
+            content={comment.content}
+            date={formatDate(comment.modified_at)}
           />
         ))}
       </div>
     </div>
   );
-}; 
+};
+
+export default Comments; 

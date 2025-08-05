@@ -54,8 +54,9 @@ export default class CommentService {
     static async update(comment) {
 
         const id = comment.id
+        
         if (!id) {
-            throw new Error('Comentário não encontrado com esse id')
+            throw new Error('Comentário não encontrado')
         }
 
         let savedComment = this.getById(id)

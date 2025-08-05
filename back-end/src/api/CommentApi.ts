@@ -119,9 +119,9 @@ commentRouter.get('/get-by-id/:id', async (request: Request, response:Response) 
  *             properties:
  *               content:
  *                 type: string
- *               forumId:
+ *               forum:
  *                 type: number
- *               usernameAuthor:
+ *               username:
  *                 type: string
  *               replyToCommentId:
  *                 type: number
@@ -144,6 +144,17 @@ commentRouter.post('/', async(request: Request, response:Response) => {
         } else {
             response.status(500).send({ error: 'Error creating comment' })
         }
+    })
+})
+
+
+commentRouter.put('/:id', async(request: Request, response:Response) => {
+    const id = request.params.id
+    const comment = request.body
+    CommentService.update({id, ...comment}).then((updatedComment) => {
+        response.status(200).send(updatedComment)
+    }).catch((err) => {
+        response.status(500).send({ error: `${err.message}` })
     })
 })
 
