@@ -1,6 +1,6 @@
-import NotificationRepository from "../repository/NotificationRepository";
+import { NotificationRepository } from "../repository/NotificationRepository";
 import ForumRepository from "../repository/ForumRepository";
-import UserRepository from "../repository/UserRepository";
+import { UserRepository } from "../repository/UserRepository";
 import { Notification, NotificationType } from "../models/Notification";
 
 export class NotificationService {
@@ -33,7 +33,7 @@ export class NotificationService {
   static async createFollowNotification(followedUserId: number, followerUserId: number): Promise<Notification> {
     const notification = NotificationRepository.create({
       userId: followedUserId,
-      type: NotificationType.FOLLOW,
+      type: NotificationType.NEW_FOLLOWER,
       message: `Você tem um novo seguidor (ID: ${followerUserId})`,
       isRead: false,
     });
@@ -41,13 +41,13 @@ export class NotificationService {
   }
 
   static async createCommentNotification(forumId: number, commenterUserId: number): Promise<Notification | null> {
-    const forum = await ForumRepository.findOneBy({ id: forumId });
+    const forum = await ForumRepository.getById(forumId);
     if (!forum) {
       return null;
     }
     const notification = NotificationRepository.create({
-      userId: forum.createdBy,
-      type: NotificationType.COMMENT,
+      userId: forum.creator.id,
+      type: NotificationType.NEW_COMMENT_ON_FORUM,
       message: `Novo comentário no seu fórum (ID: ${forumId}) pelo usuário (ID: ${commenterUserId})`,
       isRead: false,
     });
