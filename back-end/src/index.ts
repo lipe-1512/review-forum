@@ -1,15 +1,12 @@
-const express = require('express')
-const PORT = 8080
-const app = express()
-const bodyParser = require('body-parser')
-import {AppDataSource} from './infra/setup_db'
-import forumRouter from './api/ForumApi'
+const express = require('express');
+const PORT = process.env.PORT || 8080;
+const app = express();
+const bodyParser = require('body-parser');
+import { AppDataSource } from './infra/setup_db';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsdoc from 'swagger-jsdoc';
-import MovieRouter from './api/MovieApi'
-import endpointsRouter from './api/endpoints'
+import endpointsRouter from './api/endpoints';
 import cors from 'cors'
-
 
 app.listen(PORT, () => {
     console.log(`Server is running 🚀 on port ${PORT}`)
@@ -22,7 +19,10 @@ app.listen(PORT, () => {
 })
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
-app.use(cors())
+app.use(cors( {
+    origin: '*'
+}
+))
 
 app.get('/', (req,res) => {
     res.send('Landing page is up!')
