@@ -49,11 +49,13 @@ defineFeature(registrationFeature, test => {
         and('sou direcionado para a área inicial do sistema', () => { /* UI Step */ });
     });
 
-    // Cenário 2: Tentativa de cadastro com e-mail existente
-    test('Usuário tenta cadastrar com dados inválidos', ({ given, when, or, then, and }) => {
+    // Cenário 2: Tentativa de cadastro com dados inválidos
+    test('Usuário tenta cadastrar com dados inválidos', ({ given, when, and, then }) => {
         given('que estou no processo de criação de uma nova conta', () => { /* UI Step */ });
         
-        when('informo um e-mail já registrado no sistema', async () => {
+        when('não preencho todos os campos obrigatórios', () => { /* Este seria outro cenário, mas a lógica de teste é similar */});
+        
+        and('informo um e-mail já registrado no sistema', async () => {
             const existingData = { username: 'usuario_existente', email: 'existente@email.com', password: 'Password123' };
             // Configuramos o mock para simular um erro, como aconteceria na vida real
             MockedUserService.registerUser.mockImplementation(() => {
@@ -67,8 +69,6 @@ defineFeature(registrationFeature, test => {
                 context.error = e;
             }
         });
-
-        or('não preencho todos os campos obrigatórios', () => { /* Este seria outro cenário, mas a lógica de teste é similar */});
         
         then('vejo mensagens de erro indicando os problemas nos dados fornecidos', () => {
             expect(context.error).toBeDefined();
@@ -78,8 +78,8 @@ defineFeature(registrationFeature, test => {
         and('permanecerei no processo de cadastro até corrigir os erros', () => { /* UI Step */});
     });
 
-    // Cenário 3: Usuário atualiza suas informações
-    test('Usuário atualiza suas informações pessoais', ({ given, when, then }) => {
+    // Cenário 3: Usuário atualiza suas informações pessoais
+    test('Usuário atualiza suas informações pessoais', ({ given, when, and, then }) => {
         let user: User;
         given('que estou autenticado no sistema', () => {
             user = new User();
@@ -89,6 +89,7 @@ defineFeature(registrationFeature, test => {
         });
 
         when('acesso a funcionalidade de edição de perfil', () => { /* UI Step */ });
+
         and('altero minhas informações pessoais, como nome ou e-mail', async () => {
             const updates = { bio: 'Nova bio atualizada' };
             const updatedUser = { ...user, ...updates };

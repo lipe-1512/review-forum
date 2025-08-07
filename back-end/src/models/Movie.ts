@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn} from 'typeorm'
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany} from 'typeorm'
+import { Review } from './Review';
 
 @Entity()
 export class Movie {
@@ -14,6 +15,9 @@ export class Movie {
 
     @CreateDateColumn()
     created_at!: Date
+
+    @OneToMany(() => Review, review => review.movie)
+    reviews!: Review[];
 
 
   constructor(name: string, description: string) {
