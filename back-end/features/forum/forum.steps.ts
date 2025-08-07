@@ -182,8 +182,8 @@ defineFeature(feature, test => {
       expect(MockedForumRepository.saveForum).not.toHaveBeenCalled();
     });
 
-    then('shold raise a error saying that "O Filme com o ID 3 não existe"', () => {
-      expect(context.error.message).toBe("O Filme com o ID 3 não existe");
+    then('shold raise a error saying that "O usuário é um campo obrigatório"', () => {
+      expect(context.error.message).toBe("O usuário é um campo obrigatório");
     });
   });
 
@@ -214,8 +214,8 @@ defineFeature(feature, test => {
       expect(MockedForumRepository.saveForum).not.toHaveBeenCalled();
     });
 
-    then('shold raise a error saying that "O filme é um campo obrigatório"', () => {
-      expect(context.error.message).toBe("O filme é um campo obrigatório");
+    then('shold raise a error saying that "O usuário é um campo obrigatório"', () => {
+      expect(context.error.message).toBe("O usuário é um campo obrigatório");
     });
   });
 });

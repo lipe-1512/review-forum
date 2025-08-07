@@ -41,11 +41,11 @@ export default class ForumService {
         }
 
         if (!forum.creatorId) {
-            throw new Error('O criador do fórum é um campo obrigatório');
+            throw new Error('O usuário é um campo obrigatório');
         }
 
         if (!forum.movieId) {
-            throw new Error('O filme é um campo obrigatório');
+            throw new Error('O usuário é um campo obrigatório');
         }
     }
     
