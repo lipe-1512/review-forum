@@ -37,7 +37,7 @@ MovieRouter.get('/', async (request, response) => {
  */
 MovieRouter.get('/get-by-id/:id', async (request: Request, response: Response) => {
     const id = request.params['id']
-    const result = await MovieServices.getById(number(id))
+    const result = await MovieServices.getById(parseInt(id))
     response.send(JSON.stringify(result))
 })
 
