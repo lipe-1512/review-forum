@@ -10,7 +10,7 @@ Feature: Cadastro e Manutenção de Usuários
   Scenario: Usuário tenta cadastrar com dados inválidos
     Given que estou no processo de criação de uma nova conta
     When não preencho todos os campos obrigatórios
-    Or informo um e-mail já registrado no sistema
+    And informo um e-mail já registrado no sistema
     Then vejo mensagens de erro indicando os problemas nos dados fornecidos
     And permaneço no processo de cadastro até corrigir os erros
 

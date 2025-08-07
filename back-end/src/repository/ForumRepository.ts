@@ -17,7 +17,7 @@ export default class ForumRepository {
     );
   }
 
-  static getById(id: Number): Promise<Forum | null> {
+  static getById(id: number): Promise<Forum | null> {
     return this.forumRepo.findOne({
       where: { id },
       relations: ["related_movie"]
@@ -33,8 +33,12 @@ export default class ForumRepository {
 
   static searchByCreatorUser(username: string): Promise<Forum[]> {
     return this.forumRepo.find({
-      where: { username },
-      relations: ["related_movie"]
+        where: {
+            creator: {
+                username: username
+            }
+        },
+        relations: ["related_movie"]
     });
   }
 
