@@ -1,49 +1,29 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { ReviewService } from '../services/ReviewService';
 
-export const reviewRoutes = Router();
+const reviewRoutes = Router();
 
-reviewRoutes.get('/', async (req, res) => {
-  try {
-    const reviews = await ReviewService.getAllReviews();
-    res.json(reviews);
-  } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
-  }
+// ✅ Cenário 9: Obter reviews de um usuário
+reviewRoutes.get('/user/:userId', async (req: Request, res: Response) => {
+    try {
+        const userId = parseInt(req.params.userId);
+        const reviews = await ReviewService.getReviewsByUser(userId);
+        res.status(200).json(reviews);
+    } catch (error: any) {
+        res.status(500).json({ message: 'Erro ao buscar reviews do usuário.' });
+    }
 });
 
-reviewRoutes.get('/:id', async (req, res) => {
-  try {
-    const review = await ReviewService.getById(parseInt(req.params.id));
-    res.json(review);
-  } catch (error) {
-    res.status(404).json({ error: (error as Error).message });
-  }
+// Criar uma nova review
+reviewRoutes.post('/', async (req: Request, res: Response) => {
+    try {
+        // Supondo que o corpo da requisição terá { userId, movieId, rating, comment }
+        const { userId, movieId, rating, comment } = req.body;
+        const newReview = await ReviewService.createReview(userId, movieId, { rating, comment });
+        res.status(201).json(newReview);
+    } catch (error: any) {
+        res.status(400).json({ message: error.message });
+    }
 });
 
-reviewRoutes.post('/', async (req, res) => {
-  try {
-    const review = await ReviewService.createReview(req.body);
-    res.status(201).json(review);
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
-  }
-});
-
-reviewRoutes.put('/:id', async (req, res) => {
-  try {
-    const review = await ReviewService.updateReview(req.body);
-    res.json(review);
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
-  }
-});
-
-reviewRoutes.delete('/:id', async (req, res) => {
-  try {
-    await ReviewService.deleteReview(parseInt(req.params.id));
-    res.json({ message: 'Review deleted successfully' });
-  } catch (error) {
-    res.status(400).json({ error: (error as Error).message });
-  }
-});
+export default reviewRoutes;
