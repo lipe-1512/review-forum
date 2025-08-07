@@ -69,6 +69,6 @@ test('Fail to create a forum without a movie', async ({ page }) => {
 
   const dialog = await dialogPromise;
   expect(dialog.type()).toBe('alert');
-  expect(dialog.message()).toBe('O filme é um campo obrigatório');
+  expect(dialog.message()).toBe('O usuário é um campo obrigatório');
   await dialog.accept();
 });
