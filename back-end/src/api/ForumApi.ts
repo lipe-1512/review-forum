@@ -16,7 +16,6 @@ const forumRouter = Router()
  */
 forumRouter.get('/', async (request: Request, response: Response) => {
     let result = await ForumService.getAll()
-
     response.send(result)
 })
 
@@ -136,9 +135,11 @@ forumRouter.get('/search-by-creator-user/:username', async (request: Request, re
 forumRouter.post('/', async (request: Request, response: Response) => {
     let forumDTO = request.body
     let result = ForumService.saveForum(forumDTO).then((result) => {
-        response.send(result).status(201)
+        console.log(result)
+        response.status(201).send(result)
     }).catch((e) => {
-        response.send({'fail': e.message}).status(400)
+        console.error(e)
+        response.status(400).send({'message': e.message})
     })
 })
 

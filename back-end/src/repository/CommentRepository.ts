@@ -7,11 +7,17 @@ export default class CommentRepository {
 
 
     static async getByForum(forumId) {
-        return this.commentRepo.createQueryBuilder("comment").where(`comment.forum = ${forumId}`).orderBy('comment.modified_at', 'DESC').getMany()
+        return this.commentRepo.createQueryBuilder("comment")
+            .where(`comment.forumId = ${forumId}`)
+            .orderBy('comment.modified_at', 'DESC')
+            .getMany()
     }
 
     static async getByCommentReference(commentReferenceId) {
-        return this.commentRepo.createQueryBuilder("comment").where(`comment.replyToCommentId = ${commentReferenceId}`).orderBy('comment.modified_at', 'DESC').getMany()
+        return this.commentRepo.createQueryBuilder("comment")
+            .where(`comment.replyToCommentId = ${commentReferenceId}`)
+            .orderBy('comment.modified_at', 'DESC')
+            .getMany()
     }
 
     static async save(comment) {

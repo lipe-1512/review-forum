@@ -22,11 +22,11 @@ export default class CommentService {
             throw new Error('O usuário é um campo obrigatório')
         }
 
-        if (!comment.forum) {
+        if (!comment.forumId) {
             throw new Error('Fórum é obrigatório')
         }
         
-        let forum = await ForumService.getById(comment.forum)
+        let forum = await ForumService.getById(comment.forumId)
 
         if (!forum) {
             throw new Error('Fórum inválido')
@@ -59,8 +59,15 @@ export default class CommentService {
             throw new Error('Comentário não encontrado')
         }
 
-        let savedComment = this.getById(id)
-        savedComment = {...comment}
+        let savedComment = await this.getById(id)
+        console.log(id, savedComment)
+        if (!savedComment) {
+            throw new Error('Comentário não encontrado')
+        }
+        savedComment.content = comment.content
+        savedComment.modified_at = new Date()
+        savedComment.isEdited = true;
+        await this.validate(savedComment)
         return CommentRepository.save(savedComment)
     }
 }

@@ -17,19 +17,46 @@
   overflow-y: auto;
 }
 
+/* Grupo de comentários (comentário principal + respostas) */
+.comment-group {
+  margin-bottom: 10px;
+}
+
+/* Container para respostas */
+.replies-container {
+  margin-left: 20px;
+  margin-top: 5px;
+  border-left: 2px solid #e0e0e0;
+  padding-left: 10px;
+}
+
 .comment {
   background: #f9f9f9;
   border-radius: 8px;
-  padding: 15px;
-  margin-bottom: 15px;
+  padding: 12px;
+  margin-bottom: 8px;
   border-left: 4px solid #007bff;
+}
+
+/* Estilo para comentários que são respostas */
+.comment-reply {
+  background: #f5f5f5;
+  border-left: 4px solid #6c757d;
+  margin-bottom: 5px;
+  padding: 10px;
+  font-size: 14px;
+}
+
+.comment-reply .author {
+  color: #6c757d;
 }
 
 .comment-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px; /* Espaçamento entre nome, data e botão */
   margin-bottom: 8px;
+  flex-wrap: wrap;
 }
 
 .author {
@@ -51,6 +78,134 @@
 .content {
   color: #333;
   line-height: 1.5;
+}
+
+/* Botão de responder */
+.reply-comment-btn {
+  background: #17a2b8;
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+  margin-left: auto;
+}
+
+.reply-comment-btn:hover {
+  background: #138496;
+}
+
+/* Estilos para edição de comentários */
+.edit-comment-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.edit-comment-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.comment-edit-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.comment-edit-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #007bff;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #333;
+  resize: vertical;
+  min-height: 60px;
+  font-family: inherit;
+}
+
+.comment-edit-input:focus {
+  outline: none;
+  border-color: #0056b3;
+}
+
+.comment-edit-buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.save-comment-btn,
+.cancel-comment-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.save-comment-btn {
+  background: #28a745;
+  color: white;
+}
+
+.save-comment-btn:hover {
+  background: #218838;
+}
+
+.cancel-comment-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.cancel-comment-btn:hover {
+  background: #c82333;
+}
+
+/* Indicador de resposta no formulário */
+.reply-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #e3f2fd;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.reply-indicator span {
+  color: #1976d2;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.cancel-reply-btn {
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.cancel-reply-btn:hover {
+  background: #d32f2f;
 }
 
 /* Estilização da scrollbar apenas para a lista de comentários */

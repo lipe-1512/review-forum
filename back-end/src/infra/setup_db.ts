@@ -12,6 +12,6 @@ export const AppDataSource = new DataSource({
   username: "postgres",
   password: "asd",
   database: "review_forum",
-  synchronize: true,       // auto-creates tables in dev :contentReference[oaicite:2]{index=2}
+  synchronize: true, 
   entities: [Movie, Forum, Comment],
 });

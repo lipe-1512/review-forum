@@ -37,14 +37,14 @@ const ForumIndexPage: React.FC = () => {
   };
 
   const handleCreateForum = async () => {
-    
-    createForum({...formData, username: username}).then((createdForum) => {
-      console.log(createdForum);
+    createForum({...formData, username: username}).then(() => {
+      setFormData({ title: '', description: '', movieId: 0, username: '' });
+      setIsModalOpen(false);
       window.location.reload();
+    }).catch(error => {
+      console.log(error);
+      alert(error.response.data.message)
     });
-    setFormData({ title: '', description: '', movieId: 0, username: '' });
-    setIsModalOpen(false);
-    await fetchForums();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {

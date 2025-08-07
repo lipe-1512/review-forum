@@ -22,9 +22,10 @@ let commentRouter = Router()
 commentRouter.get('/get-by-forum/:id', async(request: Request, response:Response) => {
     const forumId = request.params.id
     CommentService.getByForum(forumId).then((comments) => {
+        console.log(comments)
         response.send(comments).status(200)
     }).catch((error) => {
-        response.status(500).send({ error: 'Error fetching comments' })
+        response.status(500).send({ 'message': 'Error fetching comments' })
     })
 })
 
@@ -54,13 +55,13 @@ commentRouter.get('/get-by-referenced-comment/:commentId', async (request: Reque
     const commentReference = request.params.commentId
     CommentService.getCommentReplies(commentReference).then((comments) => {
         if (!comments || comments.length == 0) {
-            response.status(404).send({ error: 'No comments found' })
+            response.status(404).send({ 'message': 'No comments found' })
         } else {
             response.status(200).send(comments)
         }
     }).catch((err) => {
         console.error('Error fetching comment replies:', err)
-        response.status(500).send({ error: 'Error fetching comment replies' })
+        response.status(500).send({ 'message': 'Error fetching comment replies' })
     })
 })
 
@@ -93,12 +94,12 @@ commentRouter.get('/get-by-id/:id', async (request: Request, response:Response) 
 
     CommentService.getById(id).then((comment) => {
         if (!comment) {
-            response.status(404).send({ error: 'Comment not found' })
+            response.status(404).send({ 'message': 'Comment not found' })
         } else {
             response.status(200).send(comment)
         }
     }).catch((error) => {
-        response.status(500).send({ error: 'Error fetching comment' })
+        response.status(500).send({ 'message': 'Error fetching comment' })
     })
 })
 
@@ -140,21 +141,51 @@ commentRouter.post('/', async(request: Request, response:Response) => {
         response.status(201).send(savedComment)
     }).catch((err) => {
         if (err.message) {
-            response.status(400).send({ error: err.message })
+            response.status(400).send({ 'message': err.message })
         } else {
-            response.status(500).send({ error: 'Error creating comment' })
+            response.status(500).send({ 'message': 'Error creating comment' })
         }
     })
 })
 
 
+/**
+ * @swagger
+ * /api/comments/{id}:
+ *   put:
+ *     summary: Update a comment
+ *     tags: [comments]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               content:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Comment updated successfully
+ *       400:
+ *         description: Bad request, validation error
+ *       500:
+ *         description: Internal server error
+ */
 commentRouter.put('/:id', async(request: Request, response:Response) => {
     const id = request.params.id
     const comment = request.body
     CommentService.update({id, ...comment}).then((updatedComment) => {
         response.status(200).send(updatedComment)
     }).catch((err) => {
-        response.status(500).send({ error: `${err.message}` })
+        console.error(err)
+        response.status(500).send({ 'message': `${err.message}` })
     })
 })
 

@@ -18,7 +18,13 @@ export const createForum = async (forumData: {
     movieId: number,
     username: string
 }) => {
-    const response = await axios.post(FORUM_BASE_URL, forumData);
-    return response.data;
+    return axios.post(FORUM_BASE_URL, forumData);
+}
+
+export const updateForum = async (id: number, forumData: {
+    title: string,
+    description: string
+}) => {
+    return axios.put(FORUM_BASE_URL + id, forumData);
 }
 

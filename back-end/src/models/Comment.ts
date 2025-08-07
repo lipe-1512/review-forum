@@ -1,5 +1,4 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Forum } from "./Forum";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export default class Comment {
@@ -13,8 +12,8 @@ export default class Comment {
     @Column({ nullable: false })
     username: string;
 
-    @ManyToOne(() => Forum, (forum) => forum.id, {nullable: false})
-    forum: number;
+    @Column({ nullable: false })
+    forumId: number;
 
     @CreateDateColumn()
     created_at!: Date;
@@ -25,13 +24,13 @@ export default class Comment {
     @Column({type: 'boolean', default: false})
     isEdited!: boolean;
 
-    @ManyToOne(() => Comment, (comment) => comment.id, {nullable: true})
+    @Column({ nullable: true })
     replyToCommentId?: number;
 
     constructor(content: string, username: string, forumId: number, isEdited: boolean, replyToCommentId?: number) {
         this.content = content;
         this.username = username;
-        this.forum = forumId;
+        this.forumId = forumId;
         this.isEdited = isEdited;
         this.replyToCommentId = replyToCommentId;
     }

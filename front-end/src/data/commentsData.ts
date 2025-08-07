@@ -81,15 +81,12 @@ export const Comments: React.FC<CommentsProps> = ({ comments }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim()) {
-      // Aqui você adicionaria a lógica para salvar o comentário
-      console.log('Novo comentário:', newComment);
       setNewComment('');
     }
   };
 
   const handleReply = (commentId: number) => {
     setReplyingTo(commentId);
-    // Aqui você poderia focar no input ou abrir um modal de resposta
   };
 
   return (

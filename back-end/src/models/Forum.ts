@@ -19,7 +19,6 @@ export class Forum {
     @CreateDateColumn()
     created_at!: Date
 
-
     @UpdateDateColumn()
     updated_at!: Date;
 

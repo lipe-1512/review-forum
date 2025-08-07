@@ -42,7 +42,7 @@ export default class ForumService {
             throw new Error('O usuário é um campo obrigatório')
         }
 
-        if (!forum.movieId) {
+        if (!forum.movieId && !forum.related_movie) {
             throw new Error('O filme é um campo obrigatório')
         }
     }

@@ -9,6 +9,12 @@ export const listAll = async (forumId: any) => {
 
 
 export const create = async (comment: any) => {
-    console.log(comment);
     return axios.post(`${API_URL}`, comment);
+};
+
+export const update = async (id: number, commentData: {
+    content: string
+}) => {
+    const response = await axios.put(`${API_URL}/${id}`, commentData);
+    return response.data;
 };
