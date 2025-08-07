@@ -6,9 +6,7 @@
   "scripts": {
     "test": "jest",
     "dev": "nodemon --exec ts-node ./src/index.ts",
-    "swagger": "node ./src/swagger.ts",
-    "clean:db": "ts-node ./src/infra/cleanup-db.ts",
-    "test2": "cucumber-js"
+    "swagger": "node ./src/swagger.ts"
   },
   "repository": {
     "type": "git",
@@ -37,7 +35,6 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
-    "axios": "^1.10.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
     "express": "^5.1.0",
