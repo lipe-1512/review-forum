@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "cucumber": "jest",
     "dev": "nodemon --exec ts-node ./src/index.ts",
     "swagger": "node ./src/swagger.ts"
   },
