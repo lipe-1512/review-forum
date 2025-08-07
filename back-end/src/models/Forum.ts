@@ -1,36 +1,44 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, UpdateDateColumn } from "typeorm"
-import { Movie } from "./Movie"
+import { 
+    Entity, 
+    PrimaryGeneratedColumn, 
+    Column, 
+    CreateDateColumn, 
+    ManyToOne, 
+    UpdateDateColumn 
+} from "typeorm";
 
-@Entity()
+import { Movie } from "./Movie";
+import { User } from "./User"; 
+
+@Entity("forums") 
 export class Forum {
 
     @PrimaryGeneratedColumn()
-    id!: Number
+    id!: number; 
 
-    @Column({nullable: false, update: false})
-    username: string
+    @ManyToOne(() => User, user => user.id, { eager: true, nullable: false })
+    creator!: User;
 
     @Column()
-    title: string
+    title: string;
 
-    @Column({ nullable: true})
-    description!: string
+    @Column({ type: 'text', nullable: true })
+    description!: string;
 
     @CreateDateColumn()
-    created_at!: Date
+    created_at!: Date;
 
     @UpdateDateColumn()
     updated_at!: Date;
 
-    @ManyToOne(() => Movie, (movie) => movie.id, {nullable: false})
-    related_movie: Movie
+    @ManyToOne(() => Movie, (movie) => movie.id, { eager: true, nullable: false })
+    related_movie: Movie;
     
-    constructor(title: string, description: string, username: string, relatedMovie: Movie) {
-        this.title = title
-        this.description = description
-        this.username = username,
-        this.related_movie = relatedMovie
-    }
-  
 
+    constructor(title: string, description: string, creator: User, relatedMovie: Movie) {
+        this.title = title;
+        this.description = description;
+        this.creator = creator; 
+        this.related_movie = relatedMovie;
+    }
 }

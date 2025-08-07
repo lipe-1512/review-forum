@@ -1,6 +1,8 @@
 import { Forum } from "../models/Forum"
 import ForumRepository from "../repository/ForumRepository"
 import MovieServices from "./MovieServices"
+import { User } from "../models/User"
+import { UserService } from "./UserService"
 
 export default class ForumService {
 
@@ -16,7 +18,7 @@ export default class ForumService {
         return ForumRepository.searchByTitle(title)
     }
     static searchByCreatorUser(username: string): Promise<Forum[]> {
-        return ForumRepository.searchByCreatorUser(username)
+        return ForumRepository.searchByCreatorUsername(username)
     }
 
     static async updateForum(forum: Forum): Promise<any> {
@@ -38,12 +40,12 @@ export default class ForumService {
             throw new Error('O título do forum é obrigatório')
         }
 
-        if (!forum.username || forum.username == '') {
-            throw new Error('O usuário é um campo obrigatório')
+        if (!forum.creatorId) {
+            throw new Error('O criador do fórum é um campo obrigatório');
         }
 
-        if (!forum.movieId && !forum.related_movie) {
-            throw new Error('O filme é um campo obrigatório')
+        if (!forum.movieId) {
+            throw new Error('O filme é um campo obrigatório');
         }
     }
     

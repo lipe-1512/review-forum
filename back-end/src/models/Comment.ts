@@ -1,19 +1,22 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { User } from "./User"; 
+import { Forum } from "./Forum"; 
 
-@Entity()
+@Entity("comments")
 export default class Comment {
-
     @PrimaryGeneratedColumn()
-    id!: Number;
+    id!: number;
 
-    @Column({ nullable: false })
+    @Column({ nullable: false, type: 'text' })
     content: string;
 
-    @Column({ nullable: false })
-    username: string;
 
-    @Column({ nullable: false })
-    forumId: number;
+    @ManyToOne(() => User, user => user.id, { eager: true, nullable: false }) // 'eager: true' carrega o usuário automaticamente
+    author!: User;
+
+
+    @ManyToOne(() => Forum, forum => forum.id, { nullable: false })
+    forum!: Forum;
 
     @CreateDateColumn()
     created_at!: Date;
@@ -21,16 +24,16 @@ export default class Comment {
     @UpdateDateColumn()
     modified_at!: Date;
 
-    @Column({type: 'boolean', default: false})
+    @Column({ type: 'boolean', default: false })
     isEdited!: boolean;
 
     @Column({ nullable: true })
     replyToCommentId?: number;
 
-    constructor(content: string, username: string, forumId: number, isEdited: boolean, replyToCommentId?: number) {
+    constructor(content: string, author: User, forum: Forum, isEdited: boolean = false, replyToCommentId?: number) {
         this.content = content;
-        this.username = username;
-        this.forumId = forumId;
+        this.author = author;
+        this.forum = forum;
         this.isEdited = isEdited;
         this.replyToCommentId = replyToCommentId;
     }
