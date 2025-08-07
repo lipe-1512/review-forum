@@ -83,9 +83,13 @@ export class UserService {
     }
 
     static async unfollowUser(currentUserId: number, userIdToUnfollow: number): Promise<void> {
+        // CORREÇÃO: Adicionado 'relations: ['following']' para carregar a lista de quem o usuário segue
         const currentUser = await UserRepository.findOne({ where: { id: currentUserId }, relations: ['following'] });
         if (!currentUser) throw new Error("Usuário não encontrado.");
-        
+
+        const isFollowing = currentUser.following.some(u => u.id === userIdToUnfollow);
+        if (!isFollowing) throw new Error("Você não está seguindo este usuário.");
+
         currentUser.following = currentUser.following.filter(u => u.id !== userIdToUnfollow);
         await UserRepository.save(currentUser);
     }

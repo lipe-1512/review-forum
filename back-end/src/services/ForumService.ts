@@ -18,7 +18,7 @@ export default class ForumService {
         return ForumRepository.searchByTitle(title)
     }
     static searchByCreatorUser(username: string): Promise<Forum[]> {
-        return ForumRepository.searchByCreatorUsername(username)
+        return ForumRepository.searchByCreatorUser(username)
     }
 
     static async updateForum(forum: Forum): Promise<any> {
