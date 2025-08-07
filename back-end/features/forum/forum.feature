@@ -26,11 +26,13 @@ Scenario: Fail to create a Forum with non existing movie
   And the Movie with ID 3 does not exist
   When this user tries to create e Forum with Title "Lorem ipsum lorem ipsum", Description "What ever" and Related Movie "3"
   Then the Forum must no be created
-  And shold raise a error saying that "O criador do fórum é um campo obrigatório"
+  # MUDANÇA: A mensagem de erro agora é específica sobre o filme não encontrado.
+  And shold raise a error saying that "O Filme com o ID 3 não existe"
 
 
 Scenario: Fail to create a Forum without movie
   Given i'm logged as user with username "johndoe"
   When this user tries to create e Forum with Title "Lorem ipsum lorem ipsum", Description "What ever"
   Then the Forum must no be created
-  And shold raise a error saying that "O criador do fórum é um campo obrigatório"
+  # MUDANÇA: A mensagem de erro agora é específica sobre a ausência do filme.
+  And shold raise a error saying that "O filme é um campo obrigatório"
