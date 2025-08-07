@@ -1,7 +1,7 @@
 import { UserListItem } from "../models/UserListItem";
 import { UserListItemRepository } from "../repository/UserListItemRepository";
 import { UserRepository } from "../repository/UserRepository";
-import { MovieRepository } from "../repository/MovieRepository";
+import  MovieRepository  from "../repository/MovieRepository";
 
 export class UserListService {
     
