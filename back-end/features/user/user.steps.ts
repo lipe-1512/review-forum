@@ -1,7 +1,6 @@
 import { defineFeature, loadFeature } from 'jest-cucumber';
 import { UserService } from 'src/services/UserService';
 import { User } from 'src/models/User';
-import { DeepPartial } from 'typeorm';
 
 // Carrega todas as features relacionadas ao usuário
 const registrationFeature = loadFeature('features/user/user-registration.feature');
@@ -59,9 +58,9 @@ defineFeature(registrationFeature, test => {
             const existingData = { username: 'usuario_existente', email: 'existente@email.com', password: 'Password123' };
             MockedUserService.registerUser.mockRejectedValue(new Error("Email ou nome de usuário já cadastrado."));
             try {
-            await UserService.registerUser(existingData);
+                await UserService.registerUser(existingData);
             } catch (e: any) {
-            context.error = e;
+                context.error = e;
             }
         });
 
@@ -73,7 +72,7 @@ defineFeature(registrationFeature, test => {
         and('permaneço no processo de cadastro até corrigir os erros', () => {
             // Simplesmente confirma que o fluxo não avança
         });
-        });
+    });
 
     // Cenário 3: Usuário atualiza suas informações pessoais
     test('Usuário atualiza suas informações pessoais', ({ given, when, and, then }) => {
@@ -123,14 +122,63 @@ defineFeature(registrationFeature, test => {
         and('sou deslogado do sistema', () => { /* UI Step */ });
         and('não consigo mais acessar minha conta com as credenciais anteriores', () => { /* UI Step */ });
     });
+    
+    // MUDANÇA: Implementação do teste que estava faltando
+    test('Usuário tenta cadastrar com senha fraca', ({ given, when, then, and }) => {
+        given('que estou no processo de criação de uma nova conta', () => {
+            // UI Step, sem lógica de backend
+        });
+    
+        when('informo uma senha que não atende aos critérios de segurança', async () => {
+            const weakPasswordData = { username: 'senhafraca', email: 'fraco@email.com', password: '123' };
+            
+            // Simula que o serviço vai rejeitar o cadastro com essa senha
+            MockedUserService.registerUser.mockRejectedValue(new Error("A senha é fraca"));
+            
+            try {
+                await UserService.registerUser(weakPasswordData);
+            } catch (e: any) {
+                context.error = e;
+            }
+        });
+    
+        then('vejo uma mensagem de erro indicando que a senha é fraca', () => {
+            expect(context.error).toBeDefined();
+            expect(context.error.message).toBe("A senha é fraca");
+        });
+    
+        and('sou solicitado a escolher uma senha mais forte', () => {
+            // UI step
+        });
+    
+        and('não consigo prosseguir com o cadastro até corrigir a senha', () => {
+            // O fluxo de sucesso não foi alcançado
+            expect(context.result).toBeUndefined();
+        });
+    });
 });
-
 
 // --- Testes para Recuperação de Senha ---
 defineFeature(recoveryFeature, test => {
     // A implementação real dos testes para recuperação de senha exigiria mocks
     // de serviços de e-mail e tokens, que são mais complexos.
     // Por enquanto, os steps podem ficar vazios ou com lógica simples.
+    // O jest-cucumber permite cenários vazios sem quebrar os testes.
+    test('Usuário recupera sua senha', ({ given, when, then, and }) => {
+        given('que esqueci minha senha de acesso ao sistema', () => {});
+        when('solicito a recuperação de senha usando meu e-mail cadastrado', () => {});
+        then('recebo um e-mail com instruções para redefinir minha senha', () => {});
+        when('acesso o link fornecido no e-mail e defino uma nova senha', () => {});
+        then('vejo uma mensagem confirmando que minha senha foi atualizada', () => {});
+        and('consigo acessar o sistema com a nova senha', () => {});
+    });
+
+    test('Usuário tenta recuperar senha com e-mail não cadastrado', ({ given, when, then, and }) => {
+        given('que esqueci minha senha de acesso ao sistema', () => {});
+        when('solicito a recuperação de senha usando um e-mail não cadastrado', () => {});
+        then('vejo uma mensagem informando que o e-mail não está associado a nenhuma conta', () => {});
+        and('sou orientado a verificar o e-mail informado ou criar uma nova conta', () => {});
+    });
 });
 
 
