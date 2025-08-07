@@ -5,7 +5,7 @@ import { MovieRepository } from "../repository/MovieRepository";
 
 export class UserListService {
     
-    // ✅ Cenário 6: Adicionar item à uma lista
+    //  Cenário 6: Adicionar item à uma lista
     static async addItemToList(userId: number, movieId: number, listType: string): Promise<UserListItem> {
         const user = await UserRepository.findOneBy({ id: userId });
         const movie = await MovieRepository.getById(movieId);
@@ -27,7 +27,7 @@ export class UserListService {
         return await UserListItemRepository.save(newItem);
     }
 
-    // ✅ Cenário 7: Remover item de uma lista
+    //  Cenário 7: Remover item de uma lista
     static async removeItemFromList(listItemId: number, userId: number): Promise<void> {
         // Busca o item para garantir que ele pertence ao usuário logado
         const listItem = await UserListItemRepository.findOne({

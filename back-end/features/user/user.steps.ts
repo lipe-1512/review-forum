@@ -52,31 +52,28 @@ defineFeature(registrationFeature, test => {
     // Cenário 2: Tentativa de cadastro com dados inválidos
     test('Usuário tenta cadastrar com dados inválidos', ({ given, when, and, then }) => {
         given('que estou no processo de criação de uma nova conta', () => { /* UI Step */ });
-        
-        when('não preencho todos os campos obrigatórios', () => { /* Este seria outro cenário, mas a lógica de teste é similar */});
-        
+
+        when('não preencho todos os campos obrigatórios', () => { /* Pode ser um placeholder */ });
+
         and('informo um e-mail já registrado no sistema', async () => {
             const existingData = { username: 'usuario_existente', email: 'existente@email.com', password: 'Password123' };
-            // Configuramos o mock para simular um erro, como aconteceria na vida real
-            MockedUserService.registerUser.mockImplementation(() => {
-                throw new Error("Email ou nome de usuário já cadastrado.");
-            });
+            MockedUserService.registerUser.mockRejectedValue(new Error("Email ou nome de usuário já cadastrado."));
             try {
-                // Tentamos chamar o método, esperando que ele lance o erro
-                await UserService.registerUser(existingData);
+            await UserService.registerUser(existingData);
             } catch (e: any) {
-                // Capturamos o erro para verificar depois
-                context.error = e;
+            context.error = e;
             }
         });
-        
+
         then('vejo mensagens de erro indicando os problemas nos dados fornecidos', () => {
             expect(context.error).toBeDefined();
             expect(context.error.message).toContain("Email ou nome de usuário já cadastrado.");
         });
 
-        and('permanecerei no processo de cadastro até corrigir os erros', () => { /* UI Step */});
-    });
+        and('permaneço no processo de cadastro até corrigir os erros', () => {
+            // Simplesmente confirma que o fluxo não avança
+        });
+        });
 
     // Cenário 3: Usuário atualiza suas informações pessoais
     test('Usuário atualiza suas informações pessoais', ({ given, when, and, then }) => {

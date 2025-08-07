@@ -6,7 +6,7 @@ import { UserService } from "./UserService"
 
 export default class ForumService {
 
-    static getById(id: Number): Promise<Forum | null> {
+    static getById(id: number): Promise<Forum | null> {
         return ForumRepository.getById(id)
     }
 

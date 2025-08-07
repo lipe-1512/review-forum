@@ -7,7 +7,7 @@ import { MovieRepository } from "../repository/MovieRepository";
 
 export class ReviewService {
 
-    // ✅ Cenário 9: Parte da visualização do histórico de um usuário
+    //  Cenário 9: Parte da visualização do histórico de um usuário
     static async getReviewsByUserId(userId: number): Promise<Review[]> {
         const user = await UserRepository.findOneBy({ id: userId });
         if (!user) {

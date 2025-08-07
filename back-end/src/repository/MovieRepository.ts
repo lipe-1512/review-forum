@@ -9,7 +9,7 @@ export default class MovieRepository {
         return movieRepository.find()
     }
 
-    static getById(id: Number) : Promise<Movie | null> {
+    static getById(id: number) : Promise<Movie | null> {
         return movieRepository.findOne({
             where: {
                 id: id

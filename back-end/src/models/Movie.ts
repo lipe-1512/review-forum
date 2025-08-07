@@ -5,7 +5,7 @@ import { Review } from './Review';
 export class Movie {
 
     @PrimaryGeneratedColumn()
-    id!: Number
+    id!: number
 
     @Column()
     name: string

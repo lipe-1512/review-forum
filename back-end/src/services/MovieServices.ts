@@ -14,7 +14,7 @@ export default class MovieServices {
         return MovieRepository.saveMovie(movieToAdd)
     }
 
-    static async getById(id: Number) : Promise<Movie | null> {
+    static async getById(id: number) : Promise<Movie | null> {
         return MovieRepository.getById(id)
     }
 
