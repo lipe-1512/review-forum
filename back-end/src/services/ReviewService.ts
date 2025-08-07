@@ -3,7 +3,7 @@ import { User } from "../models/User";
 import { Movie } from "../models/Movie";
 import { ReviewRepository } from "../repository/ReviewRepository";
 import { UserRepository } from "../repository/UserRepository";
-import { MovieRepository } from "../repository/MovieRepository";
+import  MovieRepository from "../repository/MovieRepository";
 
 export class ReviewService {
 
