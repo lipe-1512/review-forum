@@ -35,3 +35,8 @@ Feature: Cadastro e Manutenção de Usuários
     Then vejo uma mensagem de erro indicando que a senha é fraca
     And sou solicitado a escolher uma senha mais forte
     And não consigo prosseguir com o cadastro até corrigir a senha
+
+  Scenario: Usuário não autenticado não pode atualizar perfil
+    Given o usuário "alice" com ID 1 existe
+    When um usuário não autenticado tenta atualizar o perfil de "alice"
+    Then a operação deve falhar com um erro de "não autorizado"
