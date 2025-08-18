@@ -1,9 +1,13 @@
-import { 
-    Entity, PrimaryGeneratedColumn, Column, 
-    CreateDateColumn, UpdateDateColumn, 
-    OneToMany, ManyToMany, JoinTable 
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    Column,
+    CreateDateColumn,
+    UpdateDateColumn,
+    OneToMany,
+    ManyToMany,
+    JoinTable
 } from "typeorm";
-
 
 import { Review } from "./Review";
 import { UserListItem } from "./UserListItem";
@@ -20,7 +24,7 @@ export class User {
     @Column({ unique: true })
     email!: string;
 
-    @Column({ select: false }) 
+    @Column({ select: false })
     password!: string;
 
     @Column({ type: 'text', nullable: true })
@@ -35,12 +39,11 @@ export class User {
     @OneToMany(() => Notification, notification => notification.user)
     notifications!: Notification[];
 
-
     @ManyToMany(() => User, user => user.followers)
     @JoinTable({
-        name: "user_followers", 
-        joinColumn: { name: "userId", referencedColumnName: "id" }, 
-        inverseJoinColumn: { name: "followerId", referencedColumnName: "id" } 
+        name: "user_followers",
+        joinColumn: { name: "userId", referencedColumnName: "id" },
+        inverseJoinColumn: { name: "followerId", referencedColumnName: "id" }
     })
     following!: User[];
 
@@ -52,4 +55,11 @@ export class User {
 
     @UpdateDateColumn()
     updated_at!: Date;
+
+    // NOVOS CAMPOS PARA RECUPERAÇÃO DE SENHA
+    @Column({ type: 'varchar', nullable: true, select: false })
+    resetPasswordToken?: string | null;
+
+    @Column({ type: 'timestamp', nullable: true, select: false })
+    resetPasswordExpires?: Date | null;
 }
