@@ -110,12 +110,11 @@ export class UserService {
         currentUser.following.push(userToFollow);
         await UserRepository.save(currentUser);
 
-        // Disparar a notificação APÓS o sucesso da operação
+        // Disparo da notificação aqui, dentro do serviço
         try {
             await NotificationService.createFollowNotification(userIdToFollow, currentUserId);
         } catch (error) {
-            // Importante: falha na notificação não deve quebrar a operação principal
-            console.error(`Falha ao criar notificação de seguir para o usuário ${userIdToFollow}:`, error);
+            console.error(`Falha ao notificar usuário ${userIdToFollow}:`, error);
         }
     }
 

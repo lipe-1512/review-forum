@@ -1,6 +1,5 @@
 import { Router, Request, Response } from 'express';
 import { UserService } from '../services/UserService';
-import { NotificationService } from '../services/NotificationService';
 import { authenticateToken } from '../middleware/authMiddleware';
 
 const userRoutes = Router();
@@ -118,27 +117,20 @@ userRoutes.delete('/:id', authenticateToken, async (req: Request, res: Response)
     }
 });
 
-// SISTEMA DE SEGUIR - ROTAS PROTEGIDAS E COM NOTIFICAÇÃO
+// SISTEMA DE SEGUIR - ROTAS PROTEGIDAS E SEM NOTIFICAÇÃO NO API
 
 // Seguir usuário
 userRoutes.post('/:id/follow', authenticateToken, async (req: Request, res: Response) => {
     try {
-        const currentUserId = res.locals.userId;
+        const currentUserId = res.locals.userId; // ID do token (seguro)
         const userIdToFollow = parseInt(req.params.id);
 
         if (currentUserId === userIdToFollow) {
             return res.status(400).json({ message: 'Você não pode seguir a si mesmo.' });
         }
 
+        // A notificação será disparada DENTRO do UserService
         await UserService.followUser(currentUserId, userIdToFollow);
-
-        await NotificationService.createNotification({
-            recipientId: userIdToFollow,
-            senderId: currentUserId,
-            type: 'follow',
-            message: 'começou a seguir você',
-            relatedId: currentUserId
-        });
 
         res.status(200).json({ message: 'Usuário seguido com sucesso.' });
     } catch (error: any) {
@@ -149,7 +141,7 @@ userRoutes.post('/:id/follow', authenticateToken, async (req: Request, res: Resp
 // Deixar de seguir
 userRoutes.post('/:id/unfollow', authenticateToken, async (req: Request, res: Response) => {
     try {
-        const currentUserId = res.locals.userId;
+        const currentUserId = res.locals.userId; // ID do token (seguro)
         const userIdToUnfollow = parseInt(req.params.id);
 
         await UserService.unfollowUser(currentUserId, userIdToUnfollow);
